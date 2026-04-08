@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Key Finder</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Header -->
+    <header>
+      <p class="app-title">Key Finder</p>
+    </header>
+
+    <!-- Drop zone -->
+    <div id="drop-zone" role="button" aria-label="Drop audio file or click to browse" tabindex="0">
+
+      <!-- Idle state -->
+      <div id="drop-prompt">
+        <!-- Waveform / audio icon -->
+        <svg class="drop-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="4"  y="20" width="4" height="16" rx="2" fill="currentColor"/>
+          <rect x="12" y="13" width="4" height="30" rx="2" fill="currentColor"/>
+          <rect x="20" y="8"  width="4" height="40" rx="2" fill="currentColor"/>
+          <rect x="28" y="16" width="4" height="24" rx="2" fill="currentColor"/>
+          <rect x="36" y="10" width="4" height="36" rx="2" fill="currentColor"/>
+          <rect x="44" y="18" width="4" height="20" rx="2" fill="currentColor"/>
+        </svg>
+
+        <p class="drop-title">Drop an audio file</p>
+        <p class="drop-subtitle">WAV &nbsp;·&nbsp; FLAC &nbsp;·&nbsp; AIFF &nbsp;·&nbsp; MP3</p>
+        <button id="browse-btn" type="button">Browse files</button>
+      </div>
+
+      <!-- Loading state -->
+      <div id="loading-view" class="hidden">
+        <div class="spinner" aria-label="Analysing"></div>
+        <p class="loading-label">Analysing&hellip;</p>
+        <p class="file-label" id="file-name"></p>
+        <div class="progress-track">
+          <div id="progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Result state -->
+      <div id="result-view" class="hidden">
+        <div class="result-key-block">
+          <span id="key-display" aria-live="polite">—</span>
+          <span id="scale-display">—</span>
+        </div>
+
+        <div class="confidence-block">
+          <div class="confidence-header">
+            <span class="confidence-label">Confidence</span>
+            <span id="confidence-display">—</span>
+          </div>
+          <div id="confidence-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+            <div id="confidence-fill"></div>
+          </div>
+        </div>
+
+        <button id="reset-btn" type="button">Analyse another file</button>
+      </div>
+
+      <!-- Error state -->
+      <div id="error-view" class="hidden">
+        <!-- Alert circle icon -->
+        <svg class="error-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2.5"/>
+          <line x1="20" y1="12" x2="20" y2="22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="20" cy="28" r="1.5" fill="currentColor"/>
+        </svg>
+        <p id="error-msg"></p>
+        <button id="error-reset" type="button">Try again</button>
+      </div>
+
+    </div><!-- /#drop-zone -->
+
+    <!-- Footer -->
+    <footer>Analysis runs entirely in your browser &mdash; no data is uploaded</footer>
+
+  </div>
+
+  <!-- Hidden file input -->
+  <input
+    type="file"
+    id="file-input"
+    accept=".wav,.flac,.aiff,.aif,.mp3,audio/wav,audio/x-wav,audio/flac,audio/x-flac,audio/aiff,audio/x-aiff,audio/mpeg"
+    style="display:none"
+    aria-hidden="true"
+  />
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
