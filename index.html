@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veggie Planting Guide</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green-dark: #2d6a4f;
+      --green-mid: #40916c;
+      --green-light: #74c69d;
+      --green-pale: #d8f3dc;
+      --green-bg: #f0faf3;
+      --indoor-color: #4361ee;
+      --indoor-light: #bac4f8;
+      --outdoor-color: #2d6a4f;
+      --outdoor-light: #95d5b2;
+      --harvest-color: #f4a261;
+      --harvest-light: #fde8d3;
+      --frost-color: #90e0ef;
+      --text: #1b2e24;
+      --text-muted: #5a7a68;
+      --border: #b7e4c7;
+      --shadow: 0 2px 12px rgba(45,106,79,0.10);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--green-bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      color: white;
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { margin-top: .4rem; opacity: .85; font-size: .95rem; }
+
+    /* ── Controls ── */
+    .controls {
+      max-width: 900px;
+      margin: 1.5rem auto 0;
+      padding: 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .75rem;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: .3rem;
+      flex: 1;
+      min-width: 180px;
+    }
+    .control-group label {
+      font-size: .78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+    }
+    .control-group select,
+    .control-group input {
+      padding: .55rem .75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      font-size: .95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .control-group select:focus,
+    .control-group input:focus { border-color: var(--green-mid); }
+
+    .filter-chips {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .chip {
+      padding: .45rem .9rem;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: white;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--green-mid); background: var(--green-pale); }
+    .chip.active { background: var(--green-mid); color: white; border-color: var(--green-mid); }
+
+    /* ── Legend ── */
+    .legend {
+      max-width: 900px;
+      margin: 1rem auto 0;
+      padding: 0 1rem;
+      display: flex;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      font-size: .8rem;
+      color: var(--text-muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: .4rem; }
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 3px;
+    }
+
+    /* ── Calendar header ── */
+    .calendar-header {
+      max-width: 900px;
+      margin: 1.25rem auto 0;
+      padding: 0 1rem;
+    }
+    .calendar-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: .5rem;
+    }
+
+    .month-bar {
+      display: grid;
+      grid-template-columns: 200px repeat(12, 1fr);
+      gap: 2px;
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding-bottom: 2px;
+    }
+    .month-bar span:first-child { /* veg name column */ }
+    .month-bar .month-label {
+      text-align: center;
+    }
+    .month-bar .month-label.frost-month {
+      color: #0077b6;
+    }
+
+    /* ── Veg cards / rows ── */
+    #veg-list {
+      max-width: 900px;
+      margin: 0 auto 2rem;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .veg-row {
+      background: white;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transition: transform .1s, box-shadow .1s;
+    }
+    .veg-row:hover { transform: translateY(-1px); box-shadow: 0 4px 18px rgba(45,106,79,0.14); }
+
+    .veg-summary {
+      display: grid;
+      grid-template-columns: 200px repeat(12, 1fr);
+      gap: 2px;
+      align-items: center;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .veg-name-cell {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .6rem .75rem;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+    .veg-icon { font-size: 1.15rem; }
+    .veg-category-badge {
+      font-size: .65rem;
+      padding: .15rem .4rem;
+      border-radius: 999px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-left: auto;
+    }
+    .badge-warm { background: #ffe8d0; color: #c05000; }
+    .badge-cool { background: #d0e8ff; color: #004080; }
+
+    .cal-cell {
+      height: 36px;
+      border-radius: 4px;
+      position: relative;
+    }
+    .cal-cell.indoor  { background: var(--indoor-light); }
+    .cal-cell.outdoor { background: var(--outdoor-light); }
+    .cal-cell.harvest { background: var(--harvest-light); }
+    .cal-cell.indoor-outdoor { background: linear-gradient(90deg, var(--indoor-light) 50%, var(--outdoor-light) 50%); }
+    .cal-cell.frost-line {
+      outline: 2px dashed var(--frost-color);
+      outline-offset: -2px;
+    }
+
+    /* ── Expand panel ── */
+    .veg-details {
+      display: none;
+      padding: 1rem 1rem 1rem 1.5rem;
+      border-top: 1.5px solid var(--green-pale);
+      background: var(--green-bg);
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .veg-row.open .veg-details { display: grid; }
+
+    .detail-section h3 {
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: .4rem;
+    }
+    .detail-section p, .detail-section li {
+      font-size: .88rem;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .detail-section ul { padding-left: 1.1rem; }
+    .detail-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .3rem .7rem;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: .5rem;
+    }
+    .badge-indoor  { background: var(--indoor-light); color: #1a2f9e; }
+    .badge-outdoor { background: var(--outdoor-light); color: var(--green-dark); }
+    .badge-harvest { background: var(--harvest-light); color: #8b3a00; }
+
+    /* ── Empty state ── */
+    #empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-muted);
+      display: none;
+    }
+    #empty-state .emoji { font-size: 3rem; }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .month-bar, .veg-summary {
+        grid-template-columns: 120px repeat(12, 1fr);
+      }
+      .veg-name-cell { padding: .5rem .4rem; font-size: .8rem; }
+      .veg-category-badge { display: none; }
+      .veg-details { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌱 Veggie Planting Guide</h1>
+  <p>Find out what to plant, when to start indoors, and when to put it in the ground.</p>
+</header>
+
+<div class="controls">
+  <div class="control-group" style="min-width:220px">
+    <label>Your Location / USDA Zone</label>
+    <select id="zone-select">
+      <option value="3">Zone 3 — Last frost ~June 1</option>
+      <option value="4">Zone 4 — Last frost ~May 15</option>
+      <option value="5">Zone 5 — Last frost ~May 1</option>
+      <option value="6" selected>Zone 6 — Last frost ~April 15</option>
+      <option value="7">Zone 7 — Last frost ~April 1</option>
+      <option value="8">Zone 8 — Last frost ~March 15</option>
+      <option value="9">Zone 9 — Last frost ~Feb 28</option>
+      <option value="10">Zone 10 — Last frost ~Jan 31</option>
+      <option value="11">Zone 11/12 — No frost</option>
+    </select>
+  </div>
+
+  <div class="control-group" style="max-width:260px">
+    <label>Search vegetables</label>
+    <input type="text" id="search" placeholder="e.g. tomato, carrot…" />
+  </div>
+
+  <div class="filter-chips" style="align-items:flex-end; padding-bottom: 0;">
+    <div style="font-size:.78rem; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); width:100%; margin-bottom:.3rem">Filter</div>
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="cool">Cool-season</button>
+    <button class="chip" data-filter="warm">Warm-season</button>
+    <button class="chip" data-filter="indoor">Starts indoors</button>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--indoor-light);border:1px solid var(--indoor-color)"></div> Start indoors</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--outdoor-light);border:1px solid var(--outdoor-color)"></div> Plant/transplant outdoors</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--harvest-light);border:1px solid var(--harvest-color)"></div> Harvest window</div>
+  <div class="legend-item"><div class="legend-dot" style="background:transparent;border:2px dashed var(--frost-color)"></div> Last frost month</div>
+</div>
+
+<div class="calendar-header">
+  <div class="month-bar" id="month-bar">
+    <span></span>
+    <!-- Month labels injected by JS -->
+  </div>
+</div>
+
+<div id="veg-list"></div>
+<div id="empty-state">
+  <div class="emoji">🥕</div>
+  <p>No vegetables match your search.</p>
+</div>
+
+<script>
+// ── Zone data ────────────────────────────────────────────────────────────────
+// lastFrostMonth: 0-indexed month of average last frost
+// firstFrostMonth: 0-indexed month of average first fall frost
+const ZONES = {
+  3:  { lastFrost: { m: 5, d: 1  }, firstFrost: { m: 8, d: 15 }, label: "Zone 3" },
+  4:  { lastFrost: { m: 4, d: 15 }, firstFrost: { m: 8, d: 15 }, label: "Zone 4" },
+  5:  { lastFrost: { m: 4, d: 1  }, firstFrost: { m: 9, d: 15 }, label: "Zone 5" },
+  6:  { lastFrost: { m: 3, d: 15 }, firstFrost: { m: 10, d: 1  }, label: "Zone 6" },
+  7:  { lastFrost: { m: 3, d: 1  }, firstFrost: { m: 10, d: 15 }, label: "Zone 7" },
+  8:  { lastFrost: { m: 2, d: 15 }, firstFrost: { m: 11, d: 1  }, label: "Zone 8" },
+  9:  { lastFrost: { m: 1, d: 28 }, firstFrost: { m: 11, d: 15 }, label: "Zone 9" },
+  10: { lastFrost: { m: 0, d: 31 }, firstFrost: { m: 11, d: 31 }, label: "Zone 10" },
+  11: { lastFrost: null,            firstFrost: null,              label: "Zone 11/12" },
+};
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+// ── Vegetable data ────────────────────────────────────────────────────────────
+// indoor:  { weeksBeforeFrost } — weeks before last frost to start seeds indoors; null = no indoor start
+// outdoor: { weeksFromFrost }  — weeks relative to last frost for direct sow/transplant (negative = before frost)
+// harvestDays: [min, max] days from transplant/direct sow to harvest
+// frostHardy: true = survives light frost (can plant earlier outdoors)
+const VEGGIES = [
+  {
+    name: "Tomato", icon: "🍅", category: "warm",
+    desc: "The garden classic. Needs warm soil and plenty of sun. Start indoors and transplant after danger of frost.",
+    indoor: { weeks: 7, tip: "Sow 6–8 weeks before last frost. Keep soil at 70–80°F for germination." },
+    outdoor: { weeks: 2, tip: "Transplant 1–2 weeks after last frost when nighttime temps stay above 50°F." },
+    harvestDays: [60, 85],
+    frostHardy: false,
+    directSowOk: false,
+    tips: ["Bury stems deep when transplanting — roots form along the stem.", "Pinch suckers for better fruit production.", "Water deeply and consistently to prevent blossom-end rot."],
+  },
+  {
+    name: "Pepper", icon: "🫑", category: "warm",
+    desc: "Sweet or hot, peppers love heat and need a long growing season. Always start indoors.",
+    indoor: { weeks: 9, tip: "Sow 8–10 weeks before last frost. Germinate at 80–85°F — peppers are slow!" },
+    outdoor: { weeks: 2, tip: "Transplant 2 weeks after last frost. Peppers sulk in cold soil — wait for warmth." },
+    harvestDays: [70, 90],
+    frostHardy: false,
+    directSowOk: false,
+    tips: ["Use black plastic mulch to warm the soil.", "Don't over-fertilize with nitrogen — you'll get leaves, not fruit.", "Hot peppers get hotter when stressed slightly for water."],
+  },
+  {
+    name: "Cucumber", icon: "🥒", category: "warm",
+    desc: "Fast-growing and prolific. Can be started indoors or direct sown after frost.",
+    indoor: { weeks: 3, tip: "Optional: start 2–4 weeks before last frost in biodegradable pots — cucumbers hate root disturbance." },
+    outdoor: { weeks: 1, tip: "Direct sow or transplant 1 week after last frost when soil is 60°F+." },
+    harvestDays: [50, 65],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Trellis vines to save space and improve air circulation.", "Harvest frequently to keep plants producing.", "Bitter cucumbers are caused by heat stress or inconsistent watering."],
+  },
+  {
+    name: "Zucchini", icon: "🥬", category: "warm",
+    desc: "One of the most productive vegetables. One or two plants is usually plenty!",
+    indoor: { weeks: 3, tip: "Optional: start 2–3 weeks before last frost. Use biodegradable pots." },
+    outdoor: { weeks: 1, tip: "Direct sow after last frost. Sow seeds 1 inch deep." },
+    harvestDays: [45, 55],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Harvest at 6–8 inches for best flavor — they grow fast!", "Hand-pollinate if you see only flowers and no fruit early in season.", "Powdery mildew is common late season — good airflow helps."],
+  },
+  {
+    name: "Winter Squash", icon: "🎃", category: "warm",
+    desc: "Pumpkins, butternut, acorn — these store well and are worth the space.",
+    indoor: { weeks: 3, tip: "Optional: start 2–4 weeks before last frost in large cells." },
+    outdoor: { weeks: 1, tip: "Direct sow after last frost. Needs a long season — start early in short-season zones." },
+    harvestDays: [80, 110],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Leave on vine until skin is hard and can't be dented with a fingernail.", "Cure in a warm, dry spot for 2 weeks after harvest for long storage.", "Give vines plenty of room — they spread 6–10 feet."],
+  },
+  {
+    name: "Watermelon", icon: "🍉", category: "warm",
+    desc: "Needs a long, hot season. Start indoors in cooler zones.",
+    indoor: { weeks: 3, tip: "Start 3–4 weeks before last frost. Watermelons dislike transplanting — use peat pots." },
+    outdoor: { weeks: 2, tip: "Transplant 2 weeks after last frost when soil is 70°F+." },
+    harvestDays: [70, 90],
+    frostHardy: false,
+    directSowOk: false,
+    tips: ["Thump the melon — a hollow sound means it's ripe.", "Black plastic mulch dramatically improves yield in cool climates.", "Limit to 2–3 fruits per vine for larger melons."],
+  },
+  {
+    name: "Beans (Bush)", icon: "🫘", category: "warm",
+    desc: "Easy, fast, and productive. No trellising needed. Direct sow only.",
+    indoor: null,
+    outdoor: { weeks: 1, tip: "Direct sow 1 week after last frost. Beans resent transplanting — always direct sow." },
+    harvestDays: [50, 60],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Sow every 3 weeks for a continuous harvest.", "Don't water overhead — promotes disease.", "Pick regularly to keep plants producing."],
+  },
+  {
+    name: "Beans (Pole)", icon: "🫘", category: "warm",
+    desc: "Climbers that produce all season. Need a trellis or poles.",
+    indoor: null,
+    outdoor: { weeks: 1, tip: "Direct sow after last frost. Install supports before sowing." },
+    harvestDays: [60, 70],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["They produce longer than bush beans — great for small spaces.", "Let some pods dry on the vine for shell beans or seed-saving."],
+  },
+  {
+    name: "Eggplant", icon: "🍆", category: "warm",
+    desc: "Loves heat even more than tomatoes. Needs a long indoor start.",
+    indoor: { weeks: 9, tip: "Start 8–10 weeks before last frost. Needs 80–90°F to germinate — use a heat mat." },
+    outdoor: { weeks: 3, tip: "Transplant 3 weeks after last frost when nights are reliably warm." },
+    harvestDays: [70, 85],
+    frostHardy: false,
+    directSowOk: false,
+    tips: ["Use row cover early in season to keep plants warm.", "Harvest when skin is glossy — dull skin means over-ripe.", "Soak seeds overnight before sowing to improve germination."],
+  },
+  {
+    name: "Sweet Corn", icon: "🌽", category: "warm",
+    desc: "Needs space and a block planting for pollination. Direct sow only.",
+    indoor: null,
+    outdoor: { weeks: 1, tip: "Direct sow after last frost when soil is 60°F+. Plant in blocks of 4+ rows for pollination." },
+    harvestDays: [70, 90],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Sugars convert to starch fast — cook within hours of picking.", "Plant in blocks, not rows — wind pollination requires density.", "Each plant produces 1–2 ears."],
+  },
+  {
+    name: "Lettuce", icon: "🥬", category: "cool",
+    desc: "Fast and versatile. Bolts in heat — plant early in spring and again in fall.",
+    indoor: { weeks: 5, tip: "Start 4–6 weeks before last frost for early transplants. Surface sow — seeds need light to germinate." },
+    outdoor: { weeks: -4, tip: "Direct sow 4–6 weeks before last frost. Also sow in late summer for fall harvest." },
+    harvestDays: [45, 60],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Cut-and-come-again varieties give multiple harvests.", "Shade cloth extends the season in summer heat.", "Succession sow every 2–3 weeks for continuous harvest."],
+  },
+  {
+    name: "Spinach", icon: "🌿", category: "cool",
+    desc: "One of the first things you can plant. Thrives in cool weather, bolts quickly in heat.",
+    indoor: null,
+    outdoor: { weeks: -6, tip: "Direct sow 6–8 weeks before last frost — spinach tolerates hard frost." },
+    harvestDays: [40, 50],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Sow thickly and thin to 4 inches — eat the thinnings.", "Spring crop bolts fast; fall crop is often more productive.", "Seeds germinate best below 70°F."],
+  },
+  {
+    name: "Kale", icon: "🥦", category: "cool",
+    desc: "Hardy and nutritious. Flavor improves after frost. Grows almost year-round in mild climates.",
+    indoor: { weeks: 5, tip: "Start 4–6 weeks before last frost for an early crop." },
+    outdoor: { weeks: -4, tip: "Direct sow or transplant 4 weeks before last frost. Can also sow in summer for fall harvest." },
+    harvestDays: [55, 75],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Harvest lower leaves and let the plant keep growing.", "Frost sweetens the flavor by converting starch to sugar.", "Kale is biennial — leave a plant to go to seed for self-seeding."],
+  },
+  {
+    name: "Broccoli", icon: "🥦", category: "cool",
+    desc: "Best harvested before the central head flowers. Plant for spring and fall crops.",
+    indoor: { weeks: 6, tip: "Start 4–6 weeks before last frost. Transplant when seedlings are 4–6 inches tall." },
+    outdoor: { weeks: -2, tip: "Transplant 2 weeks before last frost. Also start late summer for fall crop." },
+    harvestDays: [60, 80],
+    frostHardy: true,
+    directSowOk: false,
+    tips: ["Harvest the central head before yellow flowers open.", "Side shoots continue producing after the main head is cut.", "Floating row covers prevent cabbage worm damage."],
+  },
+  {
+    name: "Cabbage", icon: "🥬", category: "cool",
+    desc: "Slow-growing but worth it. Start early indoors for spring harvest or late summer for fall.",
+    indoor: { weeks: 6, tip: "Start 6–8 weeks before last frost." },
+    outdoor: { weeks: -3, tip: "Transplant 3 weeks before last frost — tolerates light frost well." },
+    harvestDays: [80, 100],
+    frostHardy: true,
+    directSowOk: false,
+    tips: ["Heads may crack if watered heavily after a dry spell — harvest promptly when firm.", "Fall-harvested cabbage stores well in a cool location.", "Firm soil around transplants — loose soil causes loose heads."],
+  },
+  {
+    name: "Cauliflower", icon: "🥦", category: "cool",
+    desc: "Trickier than broccoli but rewarding. Blanch heads for white curds.",
+    indoor: { weeks: 6, tip: "Start 6 weeks before last frost." },
+    outdoor: { weeks: -2, tip: "Transplant 2 weeks before last frost." },
+    harvestDays: [65, 85],
+    frostHardy: true,
+    directSowOk: false,
+    tips: ["Tie outer leaves over the developing head to blanch it (keep white).", "Avoid heat stress — it causes loose, 'ricy' curds.", "Fall crops often outperform spring crops."],
+  },
+  {
+    name: "Carrot", icon: "🥕", category: "cool",
+    desc: "Takes patience but stores wonderfully. Needs loose, deep, rock-free soil.",
+    indoor: null,
+    outdoor: { weeks: -4, tip: "Direct sow 4 weeks before last frost. Cover seeds lightly — they need light to germinate." },
+    harvestDays: [70, 80],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Keep the seed bed consistently moist until germination (10–14 days).", "Thin ruthlessly to 2 inches — crowded carrots stay small.", "Frost improves sweetness by converting starch to sugar — leave in ground until needed."],
+  },
+  {
+    name: "Radish", icon: "🔴", category: "cool",
+    desc: "Fastest vegetable you can grow — ready in as little as 25 days. Great gap-filler.",
+    indoor: null,
+    outdoor: { weeks: -6, tip: "Direct sow as soon as soil is workable (6+ weeks before last frost). Succession sow every 10 days." },
+    harvestDays: [25, 40],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Harvest promptly — radishes become pithy and hot if left too long.", "Sow between slower-growing crops as a space marker.", "Daikon radishes break up compacted soil."],
+  },
+  {
+    name: "Beets", icon: "🟣", category: "cool",
+    desc: "You get two crops: roots and nutritious greens. Very easy to grow.",
+    indoor: null,
+    outdoor: { weeks: -4, tip: "Direct sow 4 weeks before last frost. Soak seeds overnight for better germination." },
+    harvestDays: [55, 70],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Each 'seed' is actually a cluster — thin to 3–4 inches.", "Eat the thinnings as baby beet greens.", "Young greens are mild; roots sweeten after a frost."],
+  },
+  {
+    name: "Peas", icon: "🫛", category: "cool",
+    desc: "Love cool weather and hate heat. One of the first things to plant in spring.",
+    indoor: null,
+    outdoor: { weeks: -6, tip: "Direct sow 4–6 weeks before last frost. Peas prefer soil under 70°F — plant early!" },
+    harvestDays: [55, 70],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Inoculate seeds with rhizobia for better nitrogen fixation.", "Provide support — even 'bush' types benefit from a short trellis.", "Harvest daily once pods fill out — plants stop producing if pods are left to mature."],
+  },
+  {
+    name: "Onion", icon: "🧅", category: "cool",
+    desc: "Start from seeds (long lead time) or sets. Day-length sensitive — choose varieties for your latitude.",
+    indoor: { weeks: 10, tip: "Start from seed 10–12 weeks before last frost. Alternatively, plant sets outdoors in early spring." },
+    outdoor: { weeks: -4, tip: "Transplant seedlings or plant sets 4 weeks before last frost." },
+    harvestDays: [100, 120],
+    frostHardy: true,
+    directSowOk: false,
+    tips: ["Short-day varieties for zones 7+; long-day for zones 6 and below; intermediate/day-neutral for any zone.", "Stop watering when tops begin to fall over.", "Cure in a warm, airy spot for 2–4 weeks before storing."],
+  },
+  {
+    name: "Garlic", icon: "🧄", category: "cool",
+    desc: "Plant in fall for a summer harvest. Hardneck varieties are best for most of the US.",
+    indoor: null,
+    outdoor: { weeks: -26, tip: "Plant individual cloves in fall, 4–6 weeks before ground freezes (typically October). Mulch heavily." },
+    harvestDays: [240, 270],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Break apart the bulb and plant the largest cloves pointed-end up, 2 inches deep.", "Remove scapes (curly flower stalks) in early summer to redirect energy to the bulb.", "Harvest when 5–6 lower leaves have browned. Cure for 4–6 weeks before storing."],
+  },
+  {
+    name: "Swiss Chard", icon: "🌈", category: "cool",
+    desc: "Productive, colorful, and heat-tolerant for a cool-season crop. Grows almost all season.",
+    indoor: { weeks: 4, tip: "Optional: start 4 weeks before last frost for early transplants." },
+    outdoor: { weeks: -3, tip: "Direct sow 3 weeks before last frost. Tolerates light frost." },
+    harvestDays: [55, 60],
+    frostHardy: true,
+    directSowOk: true,
+    tips: ["Cut outer leaves, leaving inner crown to regrow — harvest for months.", "More heat-tolerant than spinach — a great bridge crop for summer.", "Each seed cluster may sprout multiple plants; thin to 6 inches."],
+  },
+  {
+    name: "Potatoes", icon: "🥔", category: "cool",
+    desc: "Plant certified seed potatoes (not grocery store). Fun to grow and satisfying to harvest.",
+    indoor: null,
+    outdoor: { weeks: -2, tip: "Plant seed potatoes 2 weeks before last frost when soil is 45°F+." },
+    harvestDays: [70, 110],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Chit (pre-sprout) seed potatoes in a bright, cool location for 2–4 weeks before planting.", "Hill soil up around stems as they grow to increase yield and prevent greening.", "Dig new potatoes when plants flower; wait until vines die back for storage potatoes."],
+  },
+  {
+    name: "Sweet Potato", icon: "🍠", category: "warm",
+    desc: "Plant slips (rooted sprouts), not tubers. Needs a long, warm season.",
+    indoor: { weeks: 6, tip: "Start slips from a store-bought sweet potato 6 weeks before last frost. Or buy slips from a nursery." },
+    outdoor: { weeks: 3, tip: "Plant slips 3 weeks after last frost when soil is 65°F+." },
+    harvestDays: [90, 120],
+    frostHardy: false,
+    directSowOk: false,
+    tips: ["Use black plastic mulch to warm soil — critical in short-season areas.", "Vines spread widely — give them 4–5 feet.", "Cure at 80–85°F with high humidity for 10 days to develop sweetness."],
+  },
+  {
+    name: "Basil", icon: "🌿", category: "warm",
+    desc: "Essential companion for tomatoes. Very frost-sensitive — wait until warm.",
+    indoor: { weeks: 5, tip: "Start 4–6 weeks before last frost indoors." },
+    outdoor: { weeks: 2, tip: "Transplant or direct sow 2 weeks after last frost. Basil is killed by any frost." },
+    harvestDays: [25, 35],
+    frostHardy: false,
+    directSowOk: true,
+    tips: ["Pinch flower buds immediately to keep plants bushy and productive.", "Harvest in the morning for best flavor.", "Preserve by making pesto and freezing, or pack leaves in olive oil."],
+  },
+];
+
+// ── State ────────────────────────────────────────────────────────────────────
+let currentZone = 6;
+let currentFilter = "all";
+let currentSearch = "";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function lastFrostMonth(zone) {
+  const z = ZONES[zone];
+  return z.lastFrost ? z.lastFrost.m : null;
+}
+
+// Returns an array of 12 booleans: which months are "active" for a given activity
+// weeksRelativeToFrost: negative = before frost, positive = after
+// durationWeeks: how many weeks this activity spans
+function monthsActive(weeksRelativeToFrost, durationWeeks, zone) {
+  const frostM = lastFrostMonth(zone);
+  if (frostM === null) {
+    // No frost zone — just show from Jan based on typical schedule
+    const startM = Math.max(0, 1);
+    return buildMonthRange(startM, durationWeeks);
+  }
+  // Convert frost month to day-of-year, then compute start day
+  const frostDay = frostM * 30.5;
+  const startDay = frostDay + weeksRelativeToFrost * 7;
+  const startM = Math.round(startDay / 30.5);
+  return buildMonthRange(startM, durationWeeks);
+}
+
+function buildMonthRange(startM, durationWeeks) {
+  const months = new Array(12).fill(false);
+  const durationM = Math.ceil(durationWeeks / 4.3);
+  for (let i = 0; i < durationM; i++) {
+    const m = ((startM + i) % 12 + 12) % 12;
+    months[m] = true;
+  }
+  return months;
+}
+
+// Clamp harvest window to the growing season
+function harvestMonths(veg, zone) {
+  const outdoorWeeks = veg.outdoor ? veg.outdoor.weeks : 0;
+  const frostHardy = veg.frostHardy;
+
+  // Start of outdoor window
+  const frostM = lastFrostMonth(zone);
+  if (frostM === null) {
+    // No frost — harvest just after outdoor window
+    const startDay = (outdoorWeeks * 7) + (veg.harvestDays[0]);
+    return buildMonthRange(Math.round(startDay / 30.5), 6);
+  }
+  const frostDay = frostM * 30.5;
+  const outdoorStartDay = frostDay + outdoorWeeks * 7;
+  const harvestStartDay = outdoorStartDay + veg.harvestDays[0];
+  const harvestEndDay   = outdoorStartDay + veg.harvestDays[1];
+  const startM = Math.floor(harvestStartDay / 30.5);
+  const endM   = Math.ceil(harvestEndDay / 30.5);
+  const months = new Array(12).fill(false);
+  for (let m = startM; m <= endM; m++) {
+    const idx = ((m % 12) + 12) % 12;
+    if (idx >= 0 && idx < 12) months[idx] = true;
+  }
+  return months;
+}
+
+// ── Render ───────────────────────────────────────────────────────────────────
+function renderMonthBar() {
+  const bar = document.getElementById("month-bar");
+  const frostM = lastFrostMonth(currentZone);
+  bar.innerHTML = `<span></span>` + MONTHS.map((m, i) => {
+    const isFrost = i === frostM;
+    return `<span class="month-label${isFrost ? " frost-month" : ""}">${m}</span>`;
+  }).join("");
+}
+
+function renderVeggies() {
+  const list  = document.getElementById("veg-list");
+  const empty = document.getElementById("empty-state");
+  const zone  = currentZone;
+
+  const filtered = VEGGIES.filter(v => {
+    const matchSearch = currentSearch === "" ||
+      v.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+      v.desc.toLowerCase().includes(currentSearch.toLowerCase());
+    const matchFilter =
+      currentFilter === "all" ||
+      (currentFilter === "cool" && v.category === "cool") ||
+      (currentFilter === "warm" && v.category === "warm") ||
+      (currentFilter === "indoor" && v.indoor !== null);
+    return matchSearch && matchFilter;
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = "";
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  const frostM = lastFrostMonth(zone);
+
+  list.innerHTML = filtered.map(veg => {
+    const indoorMonths  = veg.indoor ? monthsActive(-(veg.indoor.weeks), 4, zone) : new Array(12).fill(false);
+    const outdoorMonths = veg.outdoor ? monthsActive(veg.outdoor.weeks, 4, zone) : new Array(12).fill(false);
+    const hvstMonths    = harvestMonths(veg, zone);
+
+    const cells = MONTHS.map((_, i) => {
+      const indr = indoorMonths[i];
+      const outr = outdoorMonths[i];
+      const hvst = hvstMonths[i];
+      const isFrost = i === frostM;
+      let cls = "cal-cell";
+      if (indr && outr) cls += " indoor-outdoor";
+      else if (indr)   cls += " indoor";
+      else if (outr)   cls += " outdoor";
+      else if (hvst)   cls += " harvest";
+      if (isFrost)     cls += " frost-line";
+      return `<div class="${cls}"></div>`;
+    }).join("");
+
+    const badge = veg.category === "warm"
+      ? `<span class="veg-category-badge badge-warm">Warm</span>`
+      : `<span class="veg-category-badge badge-cool">Cool</span>`;
+
+    const indoorDetail = veg.indoor
+      ? `<div class="detail-badge badge-indoor">🪴 Start Indoors</div>
+         <p>${veg.indoor.tip}</p>`
+      : `<p style="color:var(--text-muted);font-size:.85rem">Direct sow only — does not need indoor start.</p>`;
+
+    const outdoorDetail = veg.outdoor
+      ? `<div class="detail-badge badge-outdoor">🌿 Outdoor Planting</div>
+         <p>${veg.outdoor.tip}</p>`
+      : ``;
+
+    const harvestDetail = `<div class="detail-badge badge-harvest">🌾 Harvest</div>
+      <p>${veg.harvestDays[0]}–${veg.harvestDays[1]} days from transplant/sowing.</p>`;
+
+    const tipsHtml = veg.tips.map(t => `<li>${t}</li>`).join("");
+
+    return `
+    <div class="veg-row" id="veg-${veg.name.replace(/\s+/g,'-')}">
+      <div class="veg-summary" onclick="this.closest('.veg-row').classList.toggle('open')">
+        <div class="veg-name-cell">
+          <span class="veg-icon">${veg.icon}</span>
+          <span>${veg.name}</span>
+          ${badge}
+        </div>
+        ${cells}
+      </div>
+      <div class="veg-details">
+        <div class="detail-section">
+          <h3>Starting</h3>
+          ${indoorDetail}
+          <div style="margin-top:.75rem">${outdoorDetail}</div>
+        </div>
+        <div class="detail-section">
+          <h3>Harvest</h3>
+          ${harvestDetail}
+          <p style="margin-top:.5rem;font-size:.85rem;color:var(--text-muted)">${veg.desc}</p>
+        </div>
+        <div class="detail-section">
+          <h3>Growing Tips</h3>
+          <ul>${tipsHtml}</ul>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function render() {
+  renderMonthBar();
+  renderVeggies();
+}
+
+// ── Events ───────────────────────────────────────────────────────────────────
+document.getElementById("zone-select").addEventListener("change", e => {
+  currentZone = parseInt(e.target.value, 10);
+  render();
+});
+
+document.getElementById("search").addEventListener("input", e => {
+  currentSearch = e.target.value;
+  renderVeggies();
+});
+
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    currentFilter = chip.dataset.filter;
+    renderVeggies();
+  });
+});
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
