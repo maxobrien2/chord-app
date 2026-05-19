@@ -582,16 +582,6 @@
             <span class="ntrack"></span>
           </label>
         </div>
-        <div class="po-row">
-          <div class="po-label">
-            <span class="po-title">Sync binaural beats</span>
-            <span class="po-desc">Auto-select focus beats for work, relaxation for breaks</span>
-          </div>
-          <label class="ntoggle">
-            <input type="checkbox" id="pomo-sync" checked />
-            <span class="ntrack"></span>
-          </label>
-        </div>
       </div>
 
     </div>
@@ -663,11 +653,10 @@ const NOISE_TYPES = {
   blue:  { name: 'Blue Noise',  desc: 'Energy rises with frequency. Crisp and airy — suits active and awareness states without being fatiguing.' },
 };
 
-// Pomodoro phase → binaural preset mapping
 const POMO_CFG = {
-  work:  { label: 'Work',        color: '#0a84ff', beatId: 'deep-focus'     },
-  short: { label: 'Short Break', color: '#30d158', beatId: 'stress-relief'  },
-  long:  { label: 'Long Break',  color: '#bf5af2', beatId: 'deep-relaxation'},
+  work:  { label: 'Work',        color: '#0a84ff' },
+  short: { label: 'Short Break', color: '#30d158' },
+  long:  { label: 'Long Break',  color: '#bf5af2' },
 };
 const POMO_CIRCUM = 2 * Math.PI * 80; // 502.65
 
@@ -938,7 +927,6 @@ let pomoTotal = 25 * 60;
 let pomoInterval = null;
 let pomoDone = 0;          // completed work sessions in current cycle (0–3)
 let pomoAutoStart = false;
-let pomoSyncBeats = true;
 const pomoDurs = { work: 25, short: 5, long: 15 };
 
 function pomoTick() {
@@ -948,13 +936,14 @@ function pomoTick() {
   if (pomoSec <= 0) {
     pomoRunning = false;
     clearInterval(pomoInterval);
-    playChime();
     if (pomoMode === 'work') {
       pomoDone++;
       const toLong = pomoDone >= 4;
       if (toLong) pomoDone = 0;
+      playBreakChime();
       pomoEnterMode(toLong ? 'long' : 'short', pomoAutoStart);
     } else {
+      playWorkChime();
       pomoEnterMode('work', pomoAutoStart);
     }
   }
@@ -964,12 +953,6 @@ function pomoEnterMode(mode, autostart) {
   pomoMode = mode;
   pomoTotal = pomoDurs[mode === 'short' ? 'short' : mode === 'long' ? 'long' : 'work'] * 60;
   pomoSec = pomoTotal;
-
-  // Sync binaural beats
-  if (pomoSyncBeats) {
-    selectPreset(POMO_CFG[mode].beatId);
-    if (!isPlaying) play();
-  }
 
   if (autostart) {
     pomoRunning = true;
@@ -1026,20 +1009,24 @@ function pomoRender() {
   document.getElementById('pv-long').textContent  = pomoDurs.long;
 }
 
-function playChime() {
+function _chime(freqs, spacing, vol) {
   const ctx = ac();
   if (ctx.state === 'suspended') ctx.resume();
-  [523.25, 659.25, 783.99].forEach((freq, i) => { // C5 E5 G5
+  freqs.forEach((freq, i) => {
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.type = 'sine'; o.frequency.value = freq;
     o.connect(g); g.connect(ctx.destination);
-    const t = ctx.currentTime + i * 0.2;
+    const t = ctx.currentTime + i * spacing;
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.2, t + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
-    o.start(t); o.stop(t + 0.85);
+    g.gain.linearRampToValueAtTime(vol, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 1.1);
+    o.start(t); o.stop(t + 1.2);
   });
 }
+// Work session complete → break starting: descending, warm (wind down)
+function playBreakChime() { _chime([783.99, 659.25, 523.25], 0.28, 0.22); } // G5 E5 C5
+// Break complete → work starting: ascending, bright (wake up)
+function playWorkChime()  { _chime([523.25, 659.25, 783.99, 1046.5], 0.2, 0.2); } // C5 E5 G5 C6
 
 // ─────────────────────────────────────────────────────────────────
 // Card rendering
@@ -1149,11 +1136,6 @@ document.getElementById('pomo-start').addEventListener('click', () => {
     pomoRunning = true;
     clearInterval(pomoInterval);
     pomoInterval = setInterval(pomoTick, 1000);
-    // Sync on first start
-    if (pomoSyncBeats) {
-      selectPreset(POMO_CFG[pomoMode].beatId);
-      if (!isPlaying) play();
-    }
   } else {
     pomoRunning = false;
     clearInterval(pomoInterval);
@@ -1174,13 +1156,14 @@ document.getElementById('pomo-reset').addEventListener('click', () => {
 document.getElementById('pomo-skip').addEventListener('click', () => {
   clearInterval(pomoInterval);
   pomoRunning = false;
-  playChime();
   if (pomoMode === 'work') {
     pomoDone++;
     const toLong = pomoDone >= 4;
     if (toLong) pomoDone = 0;
+    playBreakChime();
     pomoEnterMode(toLong ? 'long' : 'short', false);
   } else {
+    playWorkChime();
     pomoEnterMode('work', false);
   }
 });
@@ -1203,7 +1186,6 @@ document.querySelectorAll('.ps-btn').forEach(btn =>
 
 // Pomodoro: options
 document.getElementById('pomo-auto').addEventListener('change', e => { pomoAutoStart = e.target.checked; });
-document.getElementById('pomo-sync').addEventListener('change', e => { pomoSyncBeats = e.target.checked; });
 
 // ─────────────────────────────────────────────────────────────────
 // Init
