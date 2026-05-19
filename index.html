@@ -574,8 +574,8 @@
       <div class="pomo-options">
         <div class="po-row">
           <div class="po-label">
-            <span class="po-title">Auto-start sessions</span>
-            <span class="po-desc">Automatically begin the next session when a timer ends</span>
+            <span class="po-title">Auto-start work after break</span>
+            <span class="po-desc">Automatically begin the work session when a break ends</span>
           </div>
           <label class="ntoggle">
             <input type="checkbox" id="pomo-auto" />
@@ -941,7 +941,7 @@ function pomoTick() {
       const toLong = pomoDone >= 4;
       if (toLong) pomoDone = 0;
       playBreakChime();
-      pomoEnterMode(toLong ? 'long' : 'short', pomoAutoStart);
+      pomoEnterMode(toLong ? 'long' : 'short', true);
     } else {
       playWorkChime();
       pomoEnterMode('work', pomoAutoStart);
@@ -1161,7 +1161,7 @@ document.getElementById('pomo-skip').addEventListener('click', () => {
     const toLong = pomoDone >= 4;
     if (toLong) pomoDone = 0;
     playBreakChime();
-    pomoEnterMode(toLong ? 'long' : 'short', false);
+    pomoEnterMode(toLong ? 'long' : 'short', true);
   } else {
     playWorkChime();
     pomoEnterMode('work', false);
