@@ -8,19 +8,19 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #000;
-      --s1:       #1c1c1e;
-      --s2:       #2c2c2e;
-      --s3:       #3a3a3c;
-      --l1:       rgba(255,255,255,1);
-      --l2:       rgba(235,235,245,0.6);
-      --l3:       rgba(235,235,245,0.3);
-      --l4:       rgba(235,235,245,0.12);
-      --sep:      rgba(84,84,88,0.65);
-      --sep2:     rgba(84,84,88,0.3);
-      --accent:   #0a84ff;
-      --r:        14px;
-      --font:     -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+      --bg:     #000;
+      --s1:     #1c1c1e;
+      --s2:     #2c2c2e;
+      --s3:     #3a3a3c;
+      --l1:     rgba(255,255,255,1);
+      --l2:     rgba(235,235,245,0.6);
+      --l3:     rgba(235,235,245,0.3);
+      --sep:    rgba(84,84,88,0.65);
+      --sep2:   rgba(84,84,88,0.3);
+      --accent: #0a84ff;
+      --green:  #30d158;
+      --r:      14px;
+      --font:   -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
     }
 
     html { -webkit-text-size-adjust: 100%; }
@@ -46,47 +46,26 @@
       -webkit-backdrop-filter: saturate(180%) blur(24px);
       border-bottom: 0.5px solid var(--sep);
     }
-
-    .logo {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: -0.4px;
-    }
-
-    .hp-note {
-      font-size: 12px;
-      color: var(--l3);
-      letter-spacing: -0.1px;
-    }
+    .logo { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
+    .hp-note { font-size: 12px; color: var(--l3); letter-spacing: -0.1px; }
 
     /* ── Main ── */
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 28px 20px 140px;
-    }
+    main { max-width: 960px; margin: 0 auto; padding: 28px 20px 140px; }
 
     /* ── Filter chips ── */
     .filter-wrap {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      margin: 0 -20px 28px;
-      padding: 0 20px;
+      margin: 0 -20px 28px; padding: 0 20px;
     }
     .filter-wrap::-webkit-scrollbar { display: none; }
-
     .filter-row { display: flex; gap: 8px; width: max-content; }
-
     .chip {
       height: 30px; padding: 0 14px;
       border-radius: 15px; border: none;
-      background: var(--s2);
-      color: var(--l2);
-      font-family: var(--font);
-      font-size: 14px; font-weight: 500;
-      letter-spacing: -0.15px;
-      cursor: pointer; white-space: nowrap;
+      background: var(--s2); color: var(--l2);
+      font-family: var(--font); font-size: 14px; font-weight: 500;
+      letter-spacing: -0.15px; cursor: pointer; white-space: nowrap;
       transition: background 0.18s, color 0.18s;
     }
     .chip:hover { background: var(--s3); color: var(--l1); }
@@ -94,216 +73,152 @@
 
     /* ── Now Playing ── */
     #now-playing {
-      display: none;
-      background: var(--s1);
-      border-radius: var(--r);
-      overflow: hidden;
-      margin-bottom: 36px;
+      display: none; background: var(--s1);
+      border-radius: var(--r); overflow: hidden; margin-bottom: 36px;
     }
     #now-playing.visible { display: block; }
 
     .np-eyebrow {
       padding: 14px 16px 0;
       font-size: 11px; font-weight: 600;
-      letter-spacing: 0.5px; text-transform: uppercase;
-      color: var(--l3);
+      letter-spacing: 0.5px; text-transform: uppercase; color: var(--l3);
     }
-
-    .np-body {
-      padding: 10px 16px 0;
-      display: flex; gap: 14px; align-items: flex-start;
-    }
-
+    .np-body { padding: 10px 16px 0; display: flex; gap: 14px; align-items: flex-start; }
     .np-art {
-      width: 56px; height: 56px;
-      border-radius: 12px;
-      flex-shrink: 0;
+      width: 56px; height: 56px; border-radius: 12px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
     }
-
-    .np-symbol {
-      font-size: 22px; font-weight: 200;
-      letter-spacing: -1px;
-      color: #fff;
-    }
-
+    .np-symbol { font-size: 22px; font-weight: 200; letter-spacing: -1px; color: #fff; }
     .np-text { flex: 1; min-width: 0; padding-top: 2px; }
-
-    .np-cat {
-      font-size: 11px; font-weight: 600;
-      letter-spacing: 0.4px; text-transform: uppercase;
-      margin-bottom: 2px;
-    }
-
-    .np-title {
-      font-size: 17px; font-weight: 600;
-      letter-spacing: -0.4px;
-      margin-bottom: 4px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-
-    .np-desc {
-      font-size: 13px; color: var(--l2);
-      line-height: 1.45; letter-spacing: -0.1px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .np-right {
-      flex-shrink: 0; text-align: right; padding-top: 2px;
-    }
-
-    .np-timer {
-      font-size: 20px; font-weight: 300;
-      letter-spacing: -0.5px;
-      font-variant-numeric: tabular-nums;
-    }
+    .np-cat { font-size: 11px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; margin-bottom: 2px; }
+    .np-title { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .np-desc { font-size: 13px; color: var(--l2); line-height: 1.45; letter-spacing: -0.1px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .np-right { flex-shrink: 0; text-align: right; padding-top: 2px; }
+    .np-timer { font-size: 20px; font-weight: 300; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
     .np-timer.active { color: var(--accent); }
     .np-timer-lbl { font-size: 11px; color: var(--l3); }
-
-    .np-stats {
-      display: flex;
-      border-top: 0.5px solid var(--sep2);
-      margin: 14px 16px 0;
-    }
-    .stat {
-      flex: 1; padding: 10px 0 12px;
-      text-align: center;
-    }
+    .np-stats { display: flex; border-top: 0.5px solid var(--sep2); margin: 14px 16px 0; }
+    .stat { flex: 1; padding: 10px 0 12px; text-align: center; }
     .stat + .stat { border-left: 0.5px solid var(--sep2); }
-    .stat-val {
-      font-size: 15px; font-weight: 600;
-      letter-spacing: -0.3px;
-    }
-    .stat-lbl {
-      font-size: 11px; color: var(--l3);
-      letter-spacing: 0.15px; margin-top: 1px;
-    }
+    .stat-val { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+    .stat-lbl { font-size: 11px; color: var(--l3); letter-spacing: 0.15px; margin-top: 1px; }
+    #np-canvas { display: block; width: 100%; height: 44px; }
 
-    /* Waveform canvas inside NP card */
-    #np-canvas {
-      display: block; width: 100%; height: 44px;
-    }
-
-    /* ── EQ bars (playing indicator) ── */
-    .eq {
-      display: none; align-items: flex-end;
-      gap: 2.5px; height: 12px;
-    }
+    /* ── EQ bars ── */
+    .eq { display: none; align-items: flex-end; gap: 2.5px; height: 12px; }
     .eq.on { display: flex; }
-    .eq span {
-      display: block; width: 3px;
-      background: var(--accent);
-      border-radius: 1.5px;
-      animation: eq 0.7s ease-in-out infinite alternate;
-    }
-    .eq span:nth-child(1) { height: 5px; animation-delay: 0s; }
+    .eq span { display: block; width: 3px; background: var(--accent); border-radius: 1.5px; animation: eq 0.7s ease-in-out infinite alternate; }
+    .eq span:nth-child(1) { height: 5px;  animation-delay: 0s; }
     .eq span:nth-child(2) { height: 10px; animation-delay: 0.12s; }
-    .eq span:nth-child(3) { height: 7px; animation-delay: 0.25s; }
-    @keyframes eq {
-      from { transform: scaleY(0.35); }
-      to   { transform: scaleY(1); }
-    }
+    .eq span:nth-child(3) { height: 7px;  animation-delay: 0.25s; }
+    @keyframes eq { from { transform: scaleY(0.35); } to { transform: scaleY(1); } }
 
     /* ── Preset grid ── */
-    .section-lbl {
-      font-size: 13px; font-weight: 600;
-      letter-spacing: 0.1px; color: var(--l2);
-      margin-bottom: 10px;
-    }
-
-    .preset-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 10px;
-      margin-bottom: 44px;
-    }
-
+    .section-lbl { font-size: 13px; font-weight: 600; letter-spacing: 0.1px; color: var(--l2); margin-bottom: 10px; }
+    .preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; margin-bottom: 44px; }
     .pcard {
-      background: var(--s1);
-      border-radius: var(--r);
-      padding: 16px;
-      cursor: pointer;
-      position: relative;
-      transition: background 0.15s ease;
-      overflow: hidden;
+      background: var(--s1); border-radius: var(--r); padding: 16px;
+      cursor: pointer; position: relative;
+      transition: background 0.15s ease; overflow: hidden;
     }
     .pcard::after {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
+      content: ''; position: absolute;
+      left: 0; top: 0; bottom: 0; width: 3px;
       border-radius: 0 1.5px 1.5px 0;
-      background: var(--accent);
-      opacity: 0;
-      transition: opacity 0.2s;
+      background: var(--accent); opacity: 0; transition: opacity 0.2s;
     }
     .pcard:hover { background: var(--s2); }
     .pcard.active::after { opacity: 1; }
-    .pcard.active { background: var(--s1); }
+    .pcard-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .pcard-cat { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    .pcard-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 5px; }
+    .pcard-desc { font-size: 12px; color: var(--l2); line-height: 1.5; letter-spacing: -0.1px; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .pcard-freq { font-size: 11px; color: var(--l3); letter-spacing: -0.05px; display: flex; align-items: center; gap: 6px; }
+    .fdot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
 
-    .pcard-top {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .pcard-cat {
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.5px; text-transform: uppercase;
-    }
-
-    .pcard-name {
-      font-size: 15px; font-weight: 600;
-      letter-spacing: -0.3px;
-      margin-bottom: 5px;
-    }
-
-    .pcard-desc {
-      font-size: 12px; color: var(--l2);
-      line-height: 1.5; letter-spacing: -0.1px;
-      margin-bottom: 12px;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    /* ── Noise section ── */
+    .noise-card {
+      background: var(--s1);
+      border-radius: var(--r);
+      margin-bottom: 44px;
       overflow: hidden;
     }
 
-    .pcard-freq {
-      font-size: 11px; color: var(--l3);
-      letter-spacing: -0.05px;
-      display: flex; align-items: center; gap: 6px;
+    .nc-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 16px 12px;
+      gap: 12px;
     }
-    .fdot {
-      width: 5px; height: 5px;
-      border-radius: 50%; flex-shrink: 0;
+
+    .nc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .nchip {
+      height: 28px; padding: 0 13px;
+      border-radius: 14px; border: none;
+      background: var(--s2); color: var(--l2);
+      font-family: var(--font); font-size: 13px; font-weight: 500;
+      letter-spacing: -0.1px; cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .nchip:hover { background: var(--s3); color: var(--l1); }
+    .nchip.sel { background: var(--s3); color: var(--l1); }
+    .noise-card.live .nchip.sel { background: rgba(48,209,88,0.18); color: var(--green); }
+
+    /* iOS-style toggle */
+    .ntoggle {
+      position: relative; flex-shrink: 0;
+      display: inline-block; width: 51px; height: 31px; cursor: pointer;
+    }
+    .ntoggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .ntrack {
+      position: absolute; inset: 0;
+      background: var(--s3); border-radius: 15.5px;
+      transition: background 0.22s;
+    }
+    .ntrack::after {
+      content: '';
+      position: absolute;
+      width: 27px; height: 27px;
+      border-radius: 50%; background: #fff;
+      top: 2px; left: 2px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+      transition: transform 0.22s;
+    }
+    .ntoggle input:checked ~ .ntrack { background: var(--green); }
+    .ntoggle input:checked ~ .ntrack::after { transform: translateX(20px); }
+
+    .nc-desc {
+      padding: 0 16px 14px;
+      font-size: 12px; color: var(--l3); line-height: 1.5; letter-spacing: -0.1px;
+    }
+
+    .nc-sep { height: 0.5px; background: var(--sep2); }
+
+    .nc-bottom {
+      padding: 12px 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nc-vol-lbl {
+      font-size: 13px; color: var(--l2);
+      white-space: nowrap; min-width: 52px;
+    }
+    .nc-vol-slider { flex: 1; }
+    .nc-notch-lbl {
+      font-size: 11px; color: var(--l3);
+      white-space: nowrap; text-align: right;
     }
 
     /* ── Science reference ── */
     .sci-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 0.5px;
-      background: var(--sep2);
-      border-radius: var(--r);
-      overflow: hidden;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0.5px; background: var(--sep2); border-radius: var(--r); overflow: hidden;
     }
-    .sci-cell {
-      background: var(--s1);
-      padding: 14px;
-    }
-    .sci-wave {
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 0.2px; margin-bottom: 4px;
-    }
-    .sci-name {
-      font-size: 13px; font-weight: 600;
-      letter-spacing: -0.2px; margin-bottom: 4px;
-    }
-    .sci-body {
-      font-size: 11px; color: var(--l2);
-      line-height: 1.5; letter-spacing: -0.05px;
-    }
+    .sci-cell { background: var(--s1); padding: 14px; }
+    .sci-wave { font-size: 11px; font-weight: 700; letter-spacing: 0.2px; margin-bottom: 4px; }
+    .sci-name { font-size: 13px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 4px; }
+    .sci-body { font-size: 11px; color: var(--l2); line-height: 1.5; letter-spacing: -0.05px; }
 
     /* ── Player bar ── */
     #player {
@@ -315,96 +230,64 @@
       padding: 14px 20px;
       padding-bottom: max(14px, env(safe-area-inset-bottom));
     }
-
     .player-inner {
       max-width: 960px; margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 16px;
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 16px;
     }
-
     .pl-info { min-width: 0; }
-    .pl-name {
-      font-size: 14px; font-weight: 500;
-      letter-spacing: -0.2px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .pl-sub {
-      font-size: 12px; color: var(--l3);
-      letter-spacing: -0.1px;
-    }
-
+    .pl-name { font-size: 14px; font-weight: 500; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pl-sub { font-size: 12px; color: var(--l3); letter-spacing: -0.1px; }
     .pl-center { display: flex; align-items: center; justify-content: center; }
-
     .play-btn {
-      width: 44px; height: 44px;
-      border-radius: 50%; border: none;
+      width: 44px; height: 44px; border-radius: 50%; border: none;
       background: var(--accent);
       display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+      cursor: pointer; transition: opacity 0.15s, transform 0.1s;
     }
     .play-btn:active { transform: scale(0.92); opacity: 0.85; }
-
     .play-btn svg { width: 18px; height: 18px; fill: #fff; }
     .play-btn.playing svg { display: none; }
     .play-btn.playing::after { content: '⏸'; font-size: 16px; color: #fff; line-height: 1; }
-
-    .pl-right {
-      display: flex; align-items: center;
-      justify-content: flex-end; gap: 20px;
-    }
-
+    .pl-right { display: flex; align-items: center; justify-content: flex-end; gap: 20px; }
     .vol-row { display: flex; align-items: center; gap: 7px; }
     .vol-icon { font-size: 13px; color: var(--l3); }
 
     input[type=range] {
       -webkit-appearance: none; appearance: none;
-      width: 84px; height: 3px;
-      background: var(--s3);
+      width: 84px; height: 3px; background: var(--s3);
       border-radius: 1.5px; outline: none; cursor: pointer;
     }
     input[type=range]::-webkit-slider-thumb {
       -webkit-appearance: none; appearance: none;
-      width: 16px; height: 16px;
-      border-radius: 50%; background: #fff;
+      width: 16px; height: 16px; border-radius: 50%; background: #fff;
       box-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
     input[type=range]::-moz-range-thumb {
-      width: 16px; height: 16px;
-      border-radius: 50%; background: #fff; border: none;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      width: 16px; height: 16px; border-radius: 50%; background: #fff;
+      border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.6);
     }
+    .nc-vol-slider { width: auto; }
 
     .timer-row { display: flex; gap: 5px; }
     .tpill {
-      height: 26px; padding: 0 10px;
-      border-radius: 13px; border: none;
-      background: var(--s3);
-      color: var(--l2);
-      font-family: var(--font);
-      font-size: 12px; font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s;
+      height: 26px; padding: 0 10px; border-radius: 13px; border: none;
+      background: var(--s3); color: var(--l2);
+      font-family: var(--font); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: background 0.15s, color 0.15s;
     }
     .tpill:hover { background: var(--s2); color: var(--l1); }
     .tpill.on { background: rgba(10,132,255,0.2); color: var(--accent); }
 
     /* ── Responsive ── */
     @media (max-width: 600px) {
-      .player-inner {
-        grid-template-columns: 1fr auto;
-        grid-template-rows: auto auto;
-      }
-      .pl-right {
-        grid-column: 1 / -1;
-        justify-content: space-between;
-      }
+      .player-inner { grid-template-columns: 1fr auto; grid-template-rows: auto auto; }
+      .pl-right { grid-column: 1 / -1; justify-content: space-between; }
       .preset-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
       .pcard { padding: 12px; }
+      .nc-bottom { flex-wrap: wrap; gap: 8px; }
+      .nc-notch-lbl { width: 100%; text-align: left; }
     }
-
     @media (max-width: 380px) {
       .preset-grid { grid-template-columns: 1fr; }
     }
@@ -448,18 +331,9 @@
       </div>
     </div>
     <div class="np-stats">
-      <div class="stat">
-        <div class="stat-val" id="s-beat">—</div>
-        <div class="stat-lbl">Beat Hz</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="s-wave">—</div>
-        <div class="stat-lbl">Brainwave</div>
-      </div>
-      <div class="stat">
-        <div class="stat-val" id="s-carrier">—</div>
-        <div class="stat-lbl">Carrier Hz</div>
-      </div>
+      <div class="stat"><div class="stat-val" id="s-beat">—</div><div class="stat-lbl">Beat Hz</div></div>
+      <div class="stat"><div class="stat-val" id="s-wave">—</div><div class="stat-lbl">Brainwave</div></div>
+      <div class="stat"><div class="stat-val" id="s-carrier">—</div><div class="stat-lbl">Carrier Hz</div></div>
     </div>
     <canvas id="np-canvas"></canvas>
   </div>
@@ -467,6 +341,30 @@
   <!-- Preset grid -->
   <div class="section-lbl" id="grid-lbl">All Presets</div>
   <div class="preset-grid" id="preset-grid"></div>
+
+  <!-- Background Noise -->
+  <div class="section-lbl">Background Noise</div>
+  <div class="noise-card" id="noise-card">
+    <div class="nc-top">
+      <div class="nc-chips">
+        <button class="nchip sel" data-type="pink">Pink</button>
+        <button class="nchip" data-type="white">White</button>
+        <button class="nchip" data-type="brown">Brown</button>
+        <button class="nchip" data-type="blue">Blue</button>
+      </div>
+      <label class="ntoggle" title="Toggle background noise">
+        <input type="checkbox" id="noise-on" />
+        <span class="ntrack"></span>
+      </label>
+    </div>
+    <div class="nc-desc" id="nc-desc">Equal energy per octave. Calming and balanced — widely studied for improving sleep quality and cognitive focus.</div>
+    <div class="nc-sep"></div>
+    <div class="nc-bottom">
+      <span class="nc-vol-lbl">Volume</span>
+      <input type="range" class="nc-vol-slider" id="noise-vol" min="0" max="100" value="35" />
+      <span class="nc-notch-lbl" id="nc-notch">EQ notch · select a preset</span>
+    </div>
+  </div>
 
   <!-- Brainwave reference -->
   <div class="section-lbl">Brainwave Reference</div>
@@ -529,96 +427,212 @@
 </div>
 
 <script>
-// ── Data ──────────────────────────────────────────────────────────
+// ── Preset / category data ────────────────────────────────────────
 const CATS = {
-  sleep:    { label: 'Sleep',       color: '#5e5ce6', sym: 'Δ' },
-  relax:    { label: 'Relaxation',  color: '#32ade6', sym: 'α' },
-  meditate: { label: 'Meditation',  color: '#bf5af2', sym: 'θ' },
-  focus:    { label: 'Focus',       color: '#ff9f0a', sym: 'β' },
-  aware:    { label: 'Awareness',   color: '#ff453a', sym: 'γ' },
+  sleep:    { label: 'Sleep',      color: '#5e5ce6', sym: 'Δ' },
+  relax:    { label: 'Relaxation', color: '#32ade6', sym: 'α' },
+  meditate: { label: 'Meditation', color: '#bf5af2', sym: 'θ' },
+  focus:    { label: 'Focus',      color: '#ff9f0a', sym: 'β' },
+  aware:    { label: 'Awareness',  color: '#ff453a', sym: 'γ' },
 };
 
 const PRESETS = [
-  { id:'deep-sleep',       cat:'sleep',    wave:'Delta', beatHz:1.5, carrierHz:100,
-    name:'Deep Sleep',
-    desc:'Guides you into deep, restorative NREM stage 3–4 sleep. Delta at 1.5 Hz promotes physical repair and immune function.' },
-  { id:'sleep-onset',      cat:'sleep',    wave:'Delta', beatHz:3,   carrierHz:100,
-    name:'Sleep Onset',
-    desc:'Eases the transition from wakefulness into sleep by mimicking the brainwave pattern of early sleep stages.' },
-  { id:'stress-relief',    cat:'relax',    wave:'Alpha', beatHz:8,   carrierHz:250,
-    name:'Stress Relief',
-    desc:'Lower-boundary alpha reduces cortisol and activates the parasympathetic nervous system, releasing accumulated tension.' },
-  { id:'deep-relaxation',  cat:'relax',    wave:'Alpha', beatHz:10,  carrierHz:250,
-    name:'Deep Relaxation',
-    desc:'Mid-range alpha — the brainwave signature of quiet, effortless wakefulness. Ideal for unwinding after a long day.' },
-  { id:'anxiety-relief',   cat:'relax',    wave:'Alpha', beatHz:12,  carrierHz:200,
-    name:'Anxiety Relief',
-    desc:'Upper alpha smooths anxious rumination. Clinically studied for pre-operative and generalised anxiety reduction.' },
-  { id:'light-meditation', cat:'meditate', wave:'Theta', beatHz:7,   carrierHz:200,
-    name:'Light Meditation',
-    desc:'High-theta supports the hypnagogic edge between waking and dreaming — creative, imagery-rich, and deeply relaxed.' },
-  { id:'deep-meditation',  cat:'meditate', wave:'Theta', beatHz:5,   carrierHz:200,
-    name:'Deep Meditation',
-    desc:'Lower theta mirrors states reported by experienced meditators. Enhances introspection, emotional processing, and insight.' },
-  { id:'creativity',       cat:'meditate', wave:'Theta', beatHz:6,   carrierHz:200,
-    name:'Creativity',
-    desc:'Theta at 6 Hz is linked to divergent thinking, creative problem-solving, and the free-associative mind.' },
-  { id:'study-focus',      cat:'focus',    wave:'Beta',  beatHz:14,  carrierHz:315,
-    name:'Study Focus',
-    desc:'Low-beta entrainment sharpens sustained attention and improves recall — well-suited to reading and structured learning.' },
-  { id:'deep-focus',       cat:'focus',    wave:'Beta',  beatHz:18,  carrierHz:315,
-    name:'Deep Focus',
-    desc:'Mid-beta supports analytical thinking, active problem-solving, and intense cognitive engagement.' },
-  { id:'flow-state',       cat:'focus',    wave:'Beta',  beatHz:22,  carrierHz:315,
-    name:'Flow State',
-    desc:'Upper-beta promotes the sustained, effortless absorption characteristic of high-performance flow states.' },
-  { id:'peak-awareness',   cat:'aware',    wave:'Gamma', beatHz:40,  carrierHz:400,
-    name:'Peak Awareness',
-    desc:'40 Hz gamma is the most-studied brainwave in cognitive neuroscience — linked to sensory binding, neuroplasticity, and heightened perception.' },
-  { id:'cognitive-boost',  cat:'aware',    wave:'Gamma', beatHz:35,  carrierHz:400,
-    name:'Cognitive Boost',
-    desc:'Lower gamma enhances memory encoding and mental sharpness without the intensity of full 40 Hz entrainment.' },
+  { id:'deep-sleep',       cat:'sleep',    wave:'Delta', beatHz:1.5, carrierHz:100,  name:'Deep Sleep',        desc:'Guides you into deep, restorative NREM stage 3–4 sleep. Delta at 1.5 Hz promotes physical repair and immune function.' },
+  { id:'sleep-onset',      cat:'sleep',    wave:'Delta', beatHz:3,   carrierHz:100,  name:'Sleep Onset',       desc:'Eases the transition from wakefulness into sleep by mimicking the brainwave pattern of early sleep stages.' },
+  { id:'stress-relief',    cat:'relax',    wave:'Alpha', beatHz:8,   carrierHz:250,  name:'Stress Relief',     desc:'Lower-boundary alpha reduces cortisol and activates the parasympathetic nervous system, releasing accumulated tension.' },
+  { id:'deep-relaxation',  cat:'relax',    wave:'Alpha', beatHz:10,  carrierHz:250,  name:'Deep Relaxation',   desc:'Mid-range alpha — the brainwave signature of quiet, effortless wakefulness. Ideal for unwinding after a long day.' },
+  { id:'anxiety-relief',   cat:'relax',    wave:'Alpha', beatHz:12,  carrierHz:200,  name:'Anxiety Relief',    desc:'Upper alpha smooths anxious rumination. Clinically studied for pre-operative and generalised anxiety reduction.' },
+  { id:'light-meditation', cat:'meditate', wave:'Theta', beatHz:7,   carrierHz:200,  name:'Light Meditation',  desc:'High-theta supports the hypnagogic edge between waking and dreaming — creative, imagery-rich, and deeply relaxed.' },
+  { id:'deep-meditation',  cat:'meditate', wave:'Theta', beatHz:5,   carrierHz:200,  name:'Deep Meditation',   desc:'Lower theta mirrors states reported by experienced meditators. Enhances introspection, emotional processing, and insight.' },
+  { id:'creativity',       cat:'meditate', wave:'Theta', beatHz:6,   carrierHz:200,  name:'Creativity',        desc:'Theta at 6 Hz is linked to divergent thinking, creative problem-solving, and the free-associative mind.' },
+  { id:'study-focus',      cat:'focus',    wave:'Beta',  beatHz:14,  carrierHz:315,  name:'Study Focus',       desc:'Low-beta entrainment sharpens sustained attention and improves recall — well-suited to reading and structured learning.' },
+  { id:'deep-focus',       cat:'focus',    wave:'Beta',  beatHz:18,  carrierHz:315,  name:'Deep Focus',        desc:'Mid-beta supports analytical thinking, active problem-solving, and intense cognitive engagement.' },
+  { id:'flow-state',       cat:'focus',    wave:'Beta',  beatHz:22,  carrierHz:315,  name:'Flow State',        desc:'Upper-beta promotes the sustained, effortless absorption characteristic of high-performance flow states.' },
+  { id:'peak-awareness',   cat:'aware',    wave:'Gamma', beatHz:40,  carrierHz:400,  name:'Peak Awareness',    desc:'40 Hz gamma is the most-studied brainwave in cognitive neuroscience — linked to sensory binding, neuroplasticity, and heightened perception.' },
+  { id:'cognitive-boost',  cat:'aware',    wave:'Gamma', beatHz:35,  carrierHz:400,  name:'Cognitive Boost',   desc:'Lower gamma enhances memory encoding and mental sharpness without the intensity of full 40 Hz entrainment.' },
 ];
 
-// ── State ─────────────────────────────────────────────────────────
-let audioCtx = null, leftOsc = null, rightOsc = null, gainNode = null, merger = null;
-let isPlaying = false, currentPreset = null;
-let timerMin = 0, timerSec = 0, timerTick = null;
-let waveRaf = null, waveT = 0;
+// ── Noise type metadata ───────────────────────────────────────────
+const NOISE_TYPES = {
+  pink:  { name: 'Pink Noise',  desc: 'Equal energy per octave. Calming and balanced — widely studied for improving sleep quality and cognitive focus.' },
+  white: { name: 'White Noise', desc: 'Flat energy spectrum. A consistent, even hiss effective for masking distractions and supporting concentration.' },
+  brown: { name: 'Brown Noise', desc: 'Energy concentrated in the bass. A deep, warm rumble — the most soothing noise type for sleep and deep relaxation.' },
+  blue:  { name: 'Blue Noise',  desc: 'Energy rises with frequency. Crisp and airy — suits active and awareness states without being fatiguing.' },
+};
 
-// ── Audio ─────────────────────────────────────────────────────────
-function ctx() {
+// ── Shared AudioContext ───────────────────────────────────────────
+let audioCtx = null;
+function ac() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
 
+// ── Binaural beat state ───────────────────────────────────────────
+let leftOsc = null, rightOsc = null, beatGain = null, beatMerger = null;
+let isPlaying = false, currentPreset = null;
+let timerMin = 0, timerSec = 0, timerTick = null;
+let waveRaf = null, waveT = 0;
+
+// ── Noise state ───────────────────────────────────────────────────
+let noiseSrc = null, noiseGainNode = null, noiseNotch = null;
+let isNoiseOn = false, noiseType = 'pink';
+const noiseBufs = {};
+
+// ── Noise buffer generation ───────────────────────────────────────
+function buildNoiseBuf(type) {
+  if (noiseBufs[type]) return noiseBufs[type];
+  const ctx = ac();
+  const len = Math.floor(ctx.sampleRate * 12); // 12 s — long enough to feel seamless
+  const buf = ctx.createBuffer(2, len, ctx.sampleRate);
+
+  for (let ch = 0; ch < 2; ch++) {
+    const d = buf.getChannelData(ch);
+
+    if (type === 'white') {
+      for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+
+    } else if (type === 'pink') {
+      // Paul Kellet's pink noise approximation
+      let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        b0 = 0.99886*b0 + w*0.0555179;
+        b1 = 0.99332*b1 + w*0.0750759;
+        b2 = 0.96900*b2 + w*0.1538520;
+        b3 = 0.86650*b3 + w*0.3104856;
+        b4 = 0.55000*b4 + w*0.5329522;
+        b5 = -0.7616*b5 - w*0.0168980;
+        d[i] = (b0+b1+b2+b3+b4+b5+b6 + w*0.5362) / 7;
+        b6 = w * 0.115926;
+      }
+
+    } else if (type === 'brown') {
+      // Brownian (red) noise: integration of white noise
+      let lastOut = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        d[i] = (lastOut + 0.02 * w) / 1.02;
+        lastOut = d[i];
+        d[i] *= 3.5;
+      }
+
+    } else if (type === 'blue') {
+      // Blue noise: first-difference of white noise (+3 dB/oct)
+      let last = 0;
+      for (let i = 0; i < len; i++) {
+        const w = Math.random() * 2 - 1;
+        d[i] = (w - last) * 0.5;
+        last = w;
+      }
+    }
+
+    // Normalise per-channel so no type clips (two-pass)
+    let peak = 0;
+    for (let i = 0; i < len; i++) peak = Math.max(peak, Math.abs(d[i]));
+    if (peak > 0) for (let i = 0; i < len; i++) d[i] /= peak;
+  }
+
+  noiseBufs[type] = buf;
+  return buf;
+}
+
+// ── Noise engine ──────────────────────────────────────────────────
+function startNoise() {
+  stopNoiseImmediate();
+  const ctx = ac();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  noiseSrc = ctx.createBufferSource();
+  noiseSrc.buffer = buildNoiseBuf(noiseType);
+  noiseSrc.loop = true;
+
+  // Notch filter carved around the current carrier frequency.
+  // Narrow Q (8) removes only a targeted band — subtly clears masking
+  // without obviously colouring the noise.
+  noiseNotch = ctx.createBiquadFilter();
+  noiseNotch.type = 'notch';
+  noiseNotch.frequency.value = currentPreset ? currentPreset.carrierHz : 200;
+  noiseNotch.Q.value = 8;
+
+  noiseGainNode = ctx.createGain();
+  const target = document.getElementById('noise-vol').value / 100 * 0.38;
+  noiseGainNode.gain.setValueAtTime(0, ctx.currentTime);
+  noiseGainNode.gain.linearRampToValueAtTime(target, ctx.currentTime + 0.4);
+
+  // Two independent L/R channels already in the buffer provide natural stereo
+  // width. Routing stays fully stereo — no mono sum, no crossfeed.
+  noiseSrc.connect(noiseNotch);
+  noiseNotch.connect(noiseGainNode);
+  noiseGainNode.connect(ctx.destination);
+
+  // Random start offset so the loop never feels obvious
+  noiseSrc.start(0, Math.random() * noiseSrc.buffer.duration);
+  updateNotchLabel();
+}
+
+function stopNoise(fade) {
+  if (!noiseGainNode) { stopNoiseImmediate(); return; }
+  const ctx = ac();
+  const g = noiseGainNode;
+  const src = noiseSrc;
+  g.gain.setTargetAtTime(0, ctx.currentTime, 0.15);
+  setTimeout(() => {
+    try { src.stop(); } catch(_){}
+    try { g.disconnect(); } catch(_){}
+    try { noiseNotch.disconnect(); } catch(_){}
+    if (noiseSrc === src) { noiseSrc = null; noiseGainNode = null; noiseNotch = null; }
+  }, 500);
+}
+
+function stopNoiseImmediate() {
+  if (noiseSrc)     { try { noiseSrc.stop(); }     catch(_){} noiseSrc     = null; }
+  if (noiseGainNode){ try { noiseGainNode.disconnect(); } catch(_){} noiseGainNode = null; }
+  if (noiseNotch)   { try { noiseNotch.disconnect(); }  catch(_){} noiseNotch    = null; }
+}
+
+function updateNotchFreq(hz) {
+  if (noiseNotch) {
+    noiseNotch.frequency.setTargetAtTime(hz, ac().currentTime, 0.12);
+  }
+  updateNotchLabel();
+}
+
+function updateNotchLabel() {
+  const lbl = document.getElementById('nc-notch');
+  if (currentPreset) {
+    lbl.textContent = `EQ notch · ${currentPreset.carrierHz} Hz carrier`;
+  } else {
+    lbl.textContent = isNoiseOn ? 'EQ notch · 200 Hz (default)' : 'EQ notch · select a preset';
+  }
+}
+
+// ── Binaural beat engine ──────────────────────────────────────────
 function startAudio(p) {
   stopAudio();
-  const ac = ctx();
-  if (ac.state === 'suspended') ac.resume();
+  const ctx = ac();
+  if (ctx.state === 'suspended') ctx.resume();
 
-  merger   = ac.createChannelMerger(2);
-  gainNode = ac.createGain();
-  gainNode.gain.value = document.getElementById('vol').value / 100;
-  merger.connect(gainNode);
-  gainNode.connect(ac.destination);
+  beatMerger = ctx.createChannelMerger(2);
+  beatGain   = ctx.createGain();
+  beatGain.gain.value = document.getElementById('vol').value / 100;
+  beatMerger.connect(beatGain);
+  beatGain.connect(ctx.destination);
 
-  leftOsc  = ac.createOscillator(); leftOsc.type  = 'sine'; leftOsc.frequency.value  = p.carrierHz;
-  rightOsc = ac.createOscillator(); rightOsc.type = 'sine'; rightOsc.frequency.value = p.carrierHz + p.beatHz;
+  leftOsc  = ctx.createOscillator(); leftOsc.type  = 'sine'; leftOsc.frequency.value  = p.carrierHz;
+  rightOsc = ctx.createOscillator(); rightOsc.type = 'sine'; rightOsc.frequency.value = p.carrierHz + p.beatHz;
 
-  const lg = ac.createGain(), rg = ac.createGain();
-  leftOsc.connect(lg);  lg.connect(merger, 0, 0);
-  rightOsc.connect(rg); rg.connect(merger, 0, 1);
-
+  const lg = ctx.createGain(), rg = ctx.createGain();
+  leftOsc.connect(lg);   lg.connect(beatMerger, 0, 0);
+  rightOsc.connect(rg);  rg.connect(beatMerger, 0, 1);
   leftOsc.start(); rightOsc.start();
 }
 
 function stopAudio() {
   [leftOsc, rightOsc].forEach(o => { if (o) { try { o.stop(); } catch(_){} } });
   leftOsc = rightOsc = null;
-  if (gainNode) gainNode.disconnect();
-  if (merger)   merger.disconnect();
-  gainNode = merger = null;
+  if (beatGain)   beatGain.disconnect();
+  if (beatMerger) beatMerger.disconnect();
+  beatGain = beatMerger = null;
 }
 
 // ── Timer ─────────────────────────────────────────────────────────
@@ -644,7 +658,7 @@ function renderTimer() {
   lbl.textContent = timerSec > 0 ? 'remaining' : 'complete';
 }
 
-// ── Waveform ──────────────────────────────────────────────────────
+// ── Waveform canvas ───────────────────────────────────────────────
 function startWave() {
   if (waveRaf) return;
   const canvas = document.getElementById('np-canvas');
@@ -661,24 +675,18 @@ function startWave() {
     const color = CATS[currentPreset?.cat]?.color || '#0a84ff';
     const beat  = currentPreset?.beatHz || 10;
 
-    // Left channel wave
     cx.beginPath();
-    cx.strokeStyle = color;
-    cx.globalAlpha = 0.55;
-    cx.lineWidth = 1.5;
+    cx.strokeStyle = color; cx.globalAlpha = 0.55; cx.lineWidth = 1.5;
     for (let x = 0; x <= W; x++) {
       const y = H/2 + Math.sin((x/W)*Math.PI*7 + waveT) * H * 0.32;
       x === 0 ? cx.moveTo(x,y) : cx.lineTo(x,y);
     }
     cx.stroke();
 
-    // Right channel wave (slightly offset freq)
     cx.beginPath();
-    cx.strokeStyle = color;
-    cx.globalAlpha = 0.25;
-    cx.lineWidth = 1;
+    cx.strokeStyle = color; cx.globalAlpha = 0.22; cx.lineWidth = 1;
     for (let x = 0; x <= W; x++) {
-      const y = H/2 + Math.sin((x/W)*Math.PI*7*(1+beat/200) + waveT*1.1) * H * 0.32;
+      const y = H/2 + Math.sin((x/W)*Math.PI*7*(1+beat/200) + waveT*1.08) * H * 0.32;
       x === 0 ? cx.moveTo(x,y) : cx.lineTo(x,y);
     }
     cx.stroke();
@@ -716,42 +724,37 @@ function selectPreset(id) {
   const wasPlaying = isPlaying;
   stop();
   currentPreset = p;
+  updateNotchFreq(p.carrierHz);
   if (wasPlaying) play();
   syncUI();
 }
 
 // ── UI sync ───────────────────────────────────────────────────────
 function syncUI() {
-  const btn = document.getElementById('play-btn');
-  btn.classList.toggle('playing', isPlaying);
-
-  // Player bar
+  document.getElementById('play-btn').classList.toggle('playing', isPlaying);
   document.getElementById('pl-name').textContent = currentPreset?.name ?? 'Select a preset';
   document.getElementById('pl-sub').textContent  = currentPreset
     ? `${currentPreset.wave} · ${currentPreset.beatHz} Hz beat · ${currentPreset.carrierHz} Hz carrier`
     : 'Binaural Beat Generator';
 
-  // Now Playing card
   const np = document.getElementById('now-playing');
   if (!currentPreset) { np.classList.remove('visible'); return; }
   np.classList.add('visible');
 
   const cat = CATS[currentPreset.cat];
-  document.getElementById('np-art').style.background = cat.color + '22';
-  document.getElementById('np-sym').textContent  = cat.sym;
-  document.getElementById('np-sym').style.color  = cat.color;
-  document.getElementById('np-cat').textContent  = cat.label;
-  document.getElementById('np-cat').style.color  = cat.color;
-  document.getElementById('np-title').textContent = currentPreset.name;
-  document.getElementById('np-desc').textContent  = currentPreset.desc;
-  document.getElementById('s-beat').textContent    = currentPreset.beatHz + ' Hz';
-  document.getElementById('s-wave').textContent    = currentPreset.wave;
-  document.getElementById('s-carrier').textContent = currentPreset.carrierHz + ' Hz';
-
-  document.getElementById('np-canvas').style.display = isPlaying ? 'block' : 'none';
+  document.getElementById('np-art').style.background  = cat.color + '22';
+  document.getElementById('np-sym').textContent        = cat.sym;
+  document.getElementById('np-sym').style.color        = cat.color;
+  document.getElementById('np-cat').textContent        = cat.label;
+  document.getElementById('np-cat').style.color        = cat.color;
+  document.getElementById('np-title').textContent      = currentPreset.name;
+  document.getElementById('np-desc').textContent       = currentPreset.desc;
+  document.getElementById('s-beat').textContent        = currentPreset.beatHz + ' Hz';
+  document.getElementById('s-wave').textContent        = currentPreset.wave;
+  document.getElementById('s-carrier').textContent     = currentPreset.carrierHz + ' Hz';
+  document.getElementById('np-canvas').style.display   = isPlaying ? 'block' : 'none';
   renderTimer();
 
-  // Cards
   document.querySelectorAll('.pcard').forEach(c => {
     const active = c.dataset.id === currentPreset.id;
     c.classList.toggle('active', active);
@@ -760,7 +763,7 @@ function syncUI() {
   });
 }
 
-// ── Card render ───────────────────────────────────────────────────
+// ── Render preset cards ───────────────────────────────────────────
 function renderCards(filter) {
   const list = filter === 'all' ? PRESETS : PRESETS.filter(p => p.cat === filter);
   document.getElementById('grid-lbl').textContent =
@@ -813,7 +816,36 @@ document.querySelectorAll('.tpill').forEach(btn =>
 );
 
 document.getElementById('vol').addEventListener('input', e => {
-  if (gainNode) gainNode.gain.value = e.target.value / 100;
+  if (beatGain) beatGain.gain.value = e.target.value / 100;
+});
+
+// Noise: type chips
+document.querySelectorAll('.nchip').forEach(btn =>
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nchip').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    noiseType = btn.dataset.type;
+    const meta = NOISE_TYPES[noiseType];
+    document.getElementById('nc-desc').textContent = meta.desc;
+    if (isNoiseOn) startNoise(); // restart with new type
+  })
+);
+
+// Noise: on/off toggle
+document.getElementById('noise-on').addEventListener('change', e => {
+  isNoiseOn = e.target.checked;
+  document.getElementById('noise-card').classList.toggle('live', isNoiseOn);
+  if (isNoiseOn) {
+    startNoise();
+  } else {
+    stopNoise(true);
+  }
+});
+
+// Noise: volume slider
+document.getElementById('noise-vol').addEventListener('input', e => {
+  const target = e.target.value / 100 * 0.38;
+  if (noiseGainNode) noiseGainNode.gain.setTargetAtTime(target, ac().currentTime, 0.05);
 });
 
 // ── Init ──────────────────────────────────────────────────────────
