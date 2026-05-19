@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BinauralFlow — Brainwave Entrainment</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09090f;
+      --surface: #13131e;
+      --surface2: #1a1a2e;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8e8f0;
+      --muted: #7070a0;
+      --accent: #7c6aff;
+      --accent2: #a78bfa;
+      --glow: rgba(124, 106, 255, 0.4);
+
+      /* category colours */
+      --sleep-c: #3b5bdb;
+      --sleep-g: linear-gradient(135deg, #0f1566 0%, #1e2a78 50%, #0a0d40 100%);
+      --relax-c: #0ea5e9;
+      --relax-g: linear-gradient(135deg, #0c3a52 0%, #0a5276 50%, #062b3d 100%);
+      --meditate-c: #a855f7;
+      --meditate-g: linear-gradient(135deg, #2a0d4a 0%, #4a1070 50%, #1a0730 100%);
+      --focus-c: #f59e0b;
+      --focus-g: linear-gradient(135deg, #3d2200 0%, #5c3300 50%, #291500 100%);
+      --aware-c: #ef4444;
+      --aware-g: linear-gradient(135deg, #3d0a0a 0%, #5c1010 50%, #290505 100%);
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Background canvas ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ── Layout ── */
+    .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ── Header ── */
+    header {
+      padding: 1.5rem 2rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: rgba(9,9,15,0.6);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo {
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), #c084fc);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo h1 {
+      font-size: 1.25rem; font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #e8e8f0, var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .logo span { font-size: 0.7rem; color: var(--muted); font-weight: 400; letter-spacing: 0.05em; display: block; }
+
+    .headphone-notice {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; color: var(--muted);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 0.35rem 0.9rem;
+    }
+    .headphone-notice .icon { font-size: 1rem; }
+
+    /* ── Main content ── */
+    main { flex: 1; padding: 1.5rem 2rem 9rem; max-width: 1100px; margin: 0 auto; width: 100%; }
+
+    /* ── Category tabs ── */
+    .category-tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.45rem 1.1rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.82rem; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .tab-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+    .tab-btn.active {
+      color: #fff;
+      border-color: transparent;
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--glow);
+    }
+
+    /* ── Active preset hero ── */
+    #hero {
+      border-radius: 20px;
+      padding: 2rem 2.5rem;
+      margin-bottom: 2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex; gap: 2rem; align-items: center;
+      transition: background 0.6s ease;
+      overflow: hidden;
+      position: relative;
+    }
+    #hero.hidden { display: none; }
+
+    #hero .hero-glow {
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      top: -80px; right: -60px;
+      pointer-events: none;
+      transition: background 0.6s ease;
+    }
+
+    .hero-visual {
+      flex-shrink: 0;
+      width: 100px; height: 100px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid;
+      animation: pulse-out 2s ease-out infinite;
+      opacity: 0;
+    }
+    .pulse-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+    .pulse-ring:nth-child(2) { width: 100%; height: 100%; animation-delay: 0.6s; }
+    .pulse-ring:nth-child(3) { width: 100%; height: 100%; animation-delay: 1.2s; }
+
+    @keyframes pulse-out {
+      0% { transform: scale(0.4); opacity: 0.8; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .hero-dot {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      position: relative; z-index: 1;
+      transition: background 0.4s ease;
+    }
+
+    .hero-info { flex: 1; }
+    .hero-info .category-badge {
+      font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+      display: inline-block; margin-bottom: 0.5rem;
+    }
+    .hero-info h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+    .hero-info p { font-size: 0.875rem; color: var(--muted); line-height: 1.6; max-width: 500px; }
+
+    .hero-meta {
+      display: flex; gap: 1.5rem; margin-top: 1rem;
+    }
+    .meta-item { text-align: center; }
+    .meta-item .val { font-size: 1.1rem; font-weight: 700; }
+    .meta-item .lbl { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .hero-right { text-align: right; flex-shrink: 0; }
+    #hero-timer { font-size: 2.5rem; font-weight: 200; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+    #hero-timer.counting { color: var(--accent2); }
+
+    /* ── Wave visualizer ── */
+    #wave-canvas {
+      width: 100%; height: 60px;
+      margin-bottom: 2rem;
+      opacity: 0.6;
+    }
+
+    /* ── Preset grid ── */
+    .section-title {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .preset-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .preset-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 0.25s;
+      border-radius: inherit;
+    }
+    .preset-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.12); }
+    .preset-card:hover::before { opacity: 1; }
+    .preset-card.active {
+      border-color: transparent;
+      box-shadow: 0 0 0 2px currentColor, 0 8px 32px rgba(0,0,0,0.4);
+    }
+
+    .card-icon { font-size: 1.6rem; margin-bottom: 0.6rem; }
+    .card-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .card-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.5; margin-bottom: 0.75rem; }
+    .card-freq {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-size: 0.7rem; color: var(--muted);
+    }
+    .freq-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .card-wave-label {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 0.15rem 0.5rem;
+      border-radius: 4px; display: inline-block; margin-bottom: 0.4rem;
+    }
+
+    /* ── Player bar ── */
+    #player {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(13,13,22,0.92);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      padding: 1rem 2rem;
+      z-index: 200;
+    }
+
+    .player-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+
+    .player-info { flex: 1; min-width: 0; }
+    .player-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-sub { font-size: 0.72rem; color: var(--muted); }
+
+    .player-controls { display: flex; align-items: center; gap: 0.75rem; }
+
+    .play-btn {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 0 20px var(--glow);
+      flex-shrink: 0;
+    }
+    .play-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--glow); }
+    .play-btn:active { transform: scale(0.96); }
+    .play-btn.playing { background: linear-gradient(135deg, var(--accent), #c084fc); }
+
+    .timer-controls { display: flex; align-items: center; gap: 0.5rem; }
+    .timer-btn {
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      font-size: 0.75rem; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .timer-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+    .timer-btn.selected { background: rgba(124,106,255,0.2); border-color: var(--accent); color: var(--accent2); }
+
+    .volume-row { display: flex; align-items: center; gap: 0.6rem; }
+    .vol-icon { font-size: 1rem; color: var(--muted); }
+    input[type=range] {
+      -webkit-appearance: none; appearance: none;
+      width: 90px; height: 4px;
+      background: var(--surface2);
+      border-radius: 2px; outline: none; cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 14px; height: 14px;
+      border-radius: 50%; background: var(--accent);
+      box-shadow: 0 0 6px var(--glow);
+    }
+    input[type=range]::-moz-range-thumb {
+      width: 14px; height: 14px;
+      border-radius: 50%; background: var(--accent);
+      border: none;
+    }
+
+    /* ── Science panel ── */
+    .science-section { margin-top: 2rem; }
+    .science-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+    .science-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem;
+    }
+    .science-card h4 { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.3rem; }
+    .science-card p { font-size: 0.72rem; color: var(--muted); line-height: 1.5; }
+    .wave-range { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+
+    /* ── Category colour helpers ── */
+    .c-sleep   { color: #6c8aff; }
+    .c-relax   { color: #38bdf8; }
+    .c-meditate { color: #c084fc; }
+    .c-focus   { color: #fbbf24; }
+    .c-aware   { color: #f87171; }
+
+    .bg-sleep   { background: rgba(59,91,219,0.15); }
+    .bg-relax   { background: rgba(14,165,233,0.15); }
+    .bg-meditate { background: rgba(168,85,247,0.15); }
+    .bg-focus   { background: rgba(245,158,11,0.15); }
+    .bg-aware   { background: rgba(239,68,68,0.15); }
+
+    .border-sleep   { color: #3b5bdb; }
+    .border-relax   { color: #0ea5e9; }
+    .border-meditate { color: #a855f7; }
+    .border-focus   { color: #f59e0b; }
+    .border-aware   { color: #ef4444; }
+
+    /* playing animation on card */
+    .preset-card.playing .card-icon { animation: bob 1s ease-in-out infinite alternate; }
+    @keyframes bob { from { transform: translateY(0); } to { transform: translateY(-3px); } }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      header { padding: 1rem; }
+      main { padding: 1rem 1rem 9rem; }
+      #hero { flex-direction: column; padding: 1.25rem; }
+      .hero-right { text-align: left; }
+      .player-inner { flex-wrap: wrap; gap: 0.75rem; }
+      .timer-controls { order: 3; }
+    }
+  </style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="app">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🌊</div>
+      <div>
+        <h1>BinauralFlow</h1>
+        <span>Science-Backed Brainwave Entrainment</span>
+      </div>
+    </div>
+    <div class="headphone-notice">
+      <span class="icon">🎧</span>
+      <span>Headphones required for binaural beats to work</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero / now-playing -->
+    <div id="hero" class="hidden">
+      <div class="hero-glow" id="hero-glow"></div>
+      <div class="hero-visual">
+        <div class="pulse-ring" id="pr1"></div>
+        <div class="pulse-ring" id="pr2"></div>
+        <div class="pulse-ring" id="pr3"></div>
+        <div class="hero-dot" id="hero-dot">🌙</div>
+      </div>
+      <div class="hero-info">
+        <div class="category-badge" id="hero-badge">Sleep</div>
+        <h2 id="hero-title">Deep Sleep</h2>
+        <p id="hero-desc">Description here.</p>
+        <div class="hero-meta">
+          <div class="meta-item">
+            <div class="val" id="meta-beat">—</div>
+            <div class="lbl">Beat Hz</div>
+          </div>
+          <div class="meta-item">
+            <div class="val" id="meta-wave">—</div>
+            <div class="lbl">Brainwave</div>
+          </div>
+          <div class="meta-item">
+            <div class="val" id="meta-carrier">—</div>
+            <div class="lbl">Carrier Hz</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div id="hero-timer">00:00</div>
+        <div style="font-size:0.7rem;color:var(--muted);text-align:right" id="timer-label">timer off</div>
+      </div>
+    </div>
+
+    <!-- Wave visualizer -->
+    <canvas id="wave-canvas" style="display:none"></canvas>
+
+    <!-- Category tabs -->
+    <div class="category-tabs">
+      <button class="tab-btn active" data-cat="all">All</button>
+      <button class="tab-btn" data-cat="sleep">🌙 Sleep</button>
+      <button class="tab-btn" data-cat="relax">💧 Relaxation</button>
+      <button class="tab-btn" data-cat="meditate">🔮 Meditation</button>
+      <button class="tab-btn" data-cat="focus">⚡ Focus</button>
+      <button class="tab-btn" data-cat="aware">✨ Awareness</button>
+    </div>
+
+    <div class="section-title" id="grid-heading">All Presets</div>
+    <div class="preset-grid" id="preset-grid"></div>
+
+    <!-- Science reference -->
+    <div class="science-section">
+      <div class="section-title">Brainwave Reference</div>
+      <div class="science-grid">
+        <div class="science-card">
+          <div class="wave-range c-sleep">Δ Delta · 0.5–4 Hz</div>
+          <h4>Deep Sleep &amp; Healing</h4>
+          <p>Dominant during deep NREM sleep. Associated with physical restoration, immune function, and unconscious processing. (Hobson &amp; Pace-Schott, 2002)</p>
+        </div>
+        <div class="science-card">
+          <div class="wave-range c-meditate">θ Theta · 4–8 Hz</div>
+          <h4>Meditation &amp; Creativity</h4>
+          <p>Prominent during drowsiness, deep meditation, and REM sleep. Linked to memory consolidation, insight, and creative problem-solving. (Klimesch, 1999)</p>
+        </div>
+        <div class="science-card">
+          <div class="wave-range c-relax">α Alpha · 8–13 Hz</div>
+          <h4>Calm Focus &amp; Relaxation</h4>
+          <p>Present during relaxed wakefulness. Binaural alpha beats significantly reduce anxiety and cortisol levels. (Padmanabhan et al., 2005)</p>
+        </div>
+        <div class="science-card">
+          <div class="wave-range c-focus">β Beta · 14–30 Hz</div>
+          <h4>Active Thinking &amp; Focus</h4>
+          <p>Associated with alert cognition, concentration, and decision-making. Beta entrainment improves working memory and sustained attention. (Beauchene et al., 2017)</p>
+        </div>
+        <div class="science-card">
+          <div class="wave-range c-aware">γ Gamma · 30–100 Hz</div>
+          <h4>Peak Awareness &amp; Cognition</h4>
+          <p>40 Hz gamma extensively studied; linked to neuroplasticity, binding of sensory information, and peak cognitive states. (Bhattacharya et al., 2001)</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Player bar -->
+  <div id="player">
+    <div class="player-inner">
+      <div class="player-info">
+        <div class="player-name" id="player-name">Select a preset to begin</div>
+        <div class="player-sub" id="player-sub">Binaural Beat Generator</div>
+      </div>
+      <div class="player-controls">
+        <button class="play-btn" id="play-btn" title="Play / Pause">▶</button>
+      </div>
+      <div class="timer-controls">
+        <span style="font-size:0.7rem;color:var(--muted);margin-right:0.25rem">Timer</span>
+        <button class="timer-btn" data-min="0">Off</button>
+        <button class="timer-btn" data-min="5">5m</button>
+        <button class="timer-btn" data-min="15">15m</button>
+        <button class="timer-btn" data-min="30">30m</button>
+        <button class="timer-btn" data-min="60">60m</button>
+      </div>
+      <div class="volume-row">
+        <span class="vol-icon">🔉</span>
+        <input type="range" id="vol-slider" min="0" max="100" value="70" />
+        <span class="vol-icon">🔊</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Preset data ──────────────────────────────────────────────────
+const PRESETS = [
+  // SLEEP
+  {
+    id: 'deep-sleep', cat: 'sleep', icon: '🌙', name: 'Deep Sleep',
+    wave: 'Delta', beatHz: 1.5, carrierHz: 100,
+    desc: 'Guides you into deep, restorative NREM stage 3–4 sleep. Delta waves at 1.5 Hz promote physical repair and immune function.',
+    science: 'Delta · 1.5 Hz · Carrier 100 Hz',
+  },
+  {
+    id: 'sleep-onset', cat: 'sleep', icon: '😴', name: 'Sleep Onset',
+    wave: 'Delta', beatHz: 3, carrierHz: 100,
+    desc: 'Eases the transition from wakefulness to sleep. Mimics the brainwave pattern of early sleep stages.',
+    science: 'Delta · 3 Hz · Carrier 100 Hz',
+  },
+  // RELAXATION
+  {
+    id: 'stress-relief', cat: 'relax', icon: '🌊', name: 'Stress Relief',
+    wave: 'Alpha', beatHz: 8, carrierHz: 250,
+    desc: 'Lower boundary alpha reduces cortisol and activates the parasympathetic nervous system, melting away tension.',
+    science: 'Alpha · 8 Hz · Carrier 250 Hz',
+  },
+  {
+    id: 'relaxation', cat: 'relax', icon: '🏖️', name: 'Deep Relaxation',
+    wave: 'Alpha', beatHz: 10, carrierHz: 250,
+    desc: 'Mid-range alpha — the brainwave signature of quiet, effortless wakefulness. Ideal for winding down.',
+    science: 'Alpha · 10 Hz · Carrier 250 Hz',
+  },
+  {
+    id: 'anxiety-relief', cat: 'relax', icon: '🕊️', name: 'Anxiety Relief',
+    wave: 'Alpha', beatHz: 12, carrierHz: 200,
+    desc: 'Upper alpha smooths anxious rumination and promotes a sense of ease. Clinically studied for pre-operative anxiety reduction.',
+    science: 'Alpha · 12 Hz · Carrier 200 Hz',
+  },
+  // MEDITATION
+  {
+    id: 'light-meditation', cat: 'meditate', icon: '🧘', name: 'Light Meditation',
+    wave: 'Theta', beatHz: 7, carrierHz: 200,
+    desc: 'High-theta supports the hypnagogic edge between waking and dreaming — creative, imagery-rich, deeply relaxed.',
+    science: 'Theta · 7 Hz · Carrier 200 Hz',
+  },
+  {
+    id: 'deep-meditation', cat: 'meditate', icon: '🔮', name: 'Deep Meditation',
+    wave: 'Theta', beatHz: 5, carrierHz: 200,
+    desc: 'Lower theta mirrors states reported by long-term meditators. Enhances introspection, emotional processing, and insight.',
+    science: 'Theta · 5 Hz · Carrier 200 Hz',
+  },
+  {
+    id: 'creativity', cat: 'meditate', icon: '🎨', name: 'Creativity',
+    wave: 'Theta', beatHz: 6, carrierHz: 200,
+    desc: 'Theta at 6 Hz is associated with divergent thinking, creative problem-solving, and the free-associative mind.',
+    science: 'Theta · 6 Hz · Carrier 200 Hz',
+  },
+  // FOCUS
+  {
+    id: 'study-focus', cat: 'focus', icon: '📚', name: 'Study Focus',
+    wave: 'Beta', beatHz: 14, carrierHz: 315,
+    desc: 'Low-beta entrainment sharpens sustained attention and improves recall — ideal for reading and structured learning.',
+    science: 'Beta · 14 Hz · Carrier 315 Hz',
+  },
+  {
+    id: 'deep-focus', cat: 'focus', icon: '⚡', name: 'Deep Focus',
+    wave: 'Beta', beatHz: 18, carrierHz: 315,
+    desc: 'Mid-beta supports analytical thinking, active problem-solving, and intense cognitive engagement.',
+    science: 'Beta · 18 Hz · Carrier 315 Hz',
+  },
+  {
+    id: 'flow-state', cat: 'focus', icon: '🌀', name: 'Flow State',
+    wave: 'Beta', beatHz: 22, carrierHz: 315,
+    desc: 'Upper-beta pushes into the sustained, effortless absorption characteristic of high-performance flow states.',
+    science: 'Beta · 22 Hz · Carrier 315 Hz',
+  },
+  // AWARENESS
+  {
+    id: 'peak-awareness', cat: 'aware', icon: '✨', name: 'Peak Awareness',
+    wave: 'Gamma', beatHz: 40, carrierHz: 400,
+    desc: '40 Hz gamma is the most studied frequency in cognitive neuroscience — linked to sensory binding, neuroplasticity, and heightened perception.',
+    science: 'Gamma · 40 Hz · Carrier 400 Hz',
+  },
+  {
+    id: 'cognitive-boost', cat: 'aware', icon: '🧠', name: 'Cognitive Boost',
+    wave: 'Gamma', beatHz: 35, carrierHz: 400,
+    desc: 'Lower gamma enhances memory encoding, cross-modal integration, and mental sharpness without overstimulation.',
+    science: 'Gamma · 35 Hz · Carrier 400 Hz',
+  },
+];
+
+const CAT_META = {
+  sleep:    { label: 'Sleep',       color: '#6c8aff', shadow: 'rgba(108,138,255,0.35)' },
+  relax:    { label: 'Relaxation',  color: '#38bdf8', shadow: 'rgba(56,189,248,0.35)' },
+  meditate: { label: 'Meditation',  color: '#c084fc', shadow: 'rgba(192,132,252,0.35)' },
+  focus:    { label: 'Focus',       color: '#fbbf24', shadow: 'rgba(251,191,36,0.35)' },
+  aware:    { label: 'Awareness',   color: '#f87171', shadow: 'rgba(248,113,113,0.35)' },
+};
+
+// ── State ──────────────────────────────────────────────────────
+let audioCtx = null;
+let leftOsc = null, rightOsc = null, gainNode = null;
+let merger = null;
+let isPlaying = false;
+let currentPreset = null;
+let timerMinutes = 0;
+let timerRemaining = 0;
+let timerInterval = null;
+let currentFilter = 'all';
+
+// ── Audio Engine ───────────────────────────────────────────────
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function startBeat(preset) {
+  stopBeat();
+  const ctx = getAudioCtx();
+  if (ctx.state === 'suspended') ctx.resume();
+
+  gainNode = ctx.createGain();
+  gainNode.gain.value = document.getElementById('vol-slider').value / 100;
+
+  merger = ctx.createChannelMerger(2);
+  merger.connect(gainNode);
+  gainNode.connect(ctx.destination);
+
+  // Left channel: carrier frequency
+  leftOsc = ctx.createOscillator();
+  leftOsc.type = 'sine';
+  leftOsc.frequency.value = preset.carrierHz;
+
+  // Right channel: carrier + beat frequency
+  rightOsc = ctx.createOscillator();
+  rightOsc.type = 'sine';
+  rightOsc.frequency.value = preset.carrierHz + preset.beatHz;
+
+  // Route oscillators to separate channels via splitter/merger trick
+  const leftGain = ctx.createGain();
+  const rightGain = ctx.createGain();
+  leftGain.gain.value = 1;
+  rightGain.gain.value = 1;
+
+  const leftSplitter = ctx.createChannelSplitter(1);
+  const rightSplitter = ctx.createChannelSplitter(1);
+
+  leftOsc.connect(leftGain);
+  rightOsc.connect(rightGain);
+
+  leftGain.connect(merger, 0, 0);
+  rightGain.connect(merger, 0, 1);
+
+  leftOsc.start();
+  rightOsc.start();
+}
+
+function stopBeat() {
+  if (leftOsc)  { try { leftOsc.stop();  } catch(e){} leftOsc  = null; }
+  if (rightOsc) { try { rightOsc.stop(); } catch(e){} rightOsc = null; }
+  if (gainNode) { gainNode.disconnect(); gainNode = null; }
+  if (merger)   { merger.disconnect();   merger   = null; }
+}
+
+// ── Timer ──────────────────────────────────────────────────────
+function startTimer(minutes) {
+  clearInterval(timerInterval);
+  timerRemaining = minutes * 60;
+  if (minutes === 0) {
+    updateTimerDisplay();
+    return;
+  }
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      stopPlayback();
+    }
+  }, 1000);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('hero-timer');
+  const lbl = document.getElementById('timer-label');
+  if (timerMinutes === 0) {
+    el.textContent = isPlaying ? formatTime(0) : '00:00';
+    el.classList.remove('counting');
+    lbl.textContent = 'timer off';
+    return;
+  }
+  el.textContent = formatTime(timerRemaining);
+  el.classList.toggle('counting', timerRemaining > 0);
+  lbl.textContent = timerRemaining > 0 ? 'remaining' : 'complete';
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+// ── Playback ───────────────────────────────────────────────────
+function startPlayback() {
+  if (!currentPreset) return;
+  isPlaying = true;
+  startBeat(currentPreset);
+  document.getElementById('play-btn').textContent = '⏸';
+  document.getElementById('play-btn').classList.add('playing');
+  document.getElementById('wave-canvas').style.display = 'block';
+  if (timerMinutes > 0) startTimer(timerMinutes);
+  markActiveCard();
+  updateHero();
+  startWaveAnim();
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  stopBeat();
+  clearInterval(timerInterval);
+  document.getElementById('play-btn').textContent = '▶';
+  document.getElementById('play-btn').classList.remove('playing');
+  document.getElementById('wave-canvas').style.display = 'none';
+  markActiveCard();
+  updateHero();
+}
+
+function togglePlayback() {
+  if (isPlaying) stopPlayback(); else startPlayback();
+}
+
+// ── UI Helpers ─────────────────────────────────────────────────
+function markActiveCard() {
+  document.querySelectorAll('.preset-card').forEach(c => {
+    const id = c.dataset.id;
+    c.classList.toggle('active',  id === currentPreset?.id);
+    c.classList.toggle('playing', id === currentPreset?.id && isPlaying);
+  });
+}
+
+function updateHero() {
+  const hero = document.getElementById('hero');
+  if (!currentPreset) { hero.classList.add('hidden'); return; }
+  hero.classList.remove('hidden');
+
+  const meta = CAT_META[currentPreset.cat];
+  const c = meta.color;
+
+  document.getElementById('hero-title').textContent   = currentPreset.name;
+  document.getElementById('hero-desc').textContent    = currentPreset.desc;
+  document.getElementById('meta-beat').textContent    = currentPreset.beatHz + ' Hz';
+  document.getElementById('meta-wave').textContent    = currentPreset.wave;
+  document.getElementById('meta-carrier').textContent = currentPreset.carrierHz + ' Hz';
+  document.getElementById('hero-dot').textContent     = currentPreset.icon;
+  document.getElementById('hero-dot').style.background = c + '33';
+
+  const badge = document.getElementById('hero-badge');
+  badge.textContent = meta.label;
+  badge.style.background = c + '22';
+  badge.style.color = c;
+
+  [document.getElementById('pr1'),document.getElementById('pr2'),document.getElementById('pr3')].forEach(r => {
+    r.style.borderColor = c;
+  });
+  document.getElementById('hero-glow').style.background = c;
+  hero.style.borderColor = c + '44';
+
+  document.getElementById('player-name').textContent = currentPreset.name;
+  document.getElementById('player-sub').textContent  = currentPreset.science;
+
+  updateTimerDisplay();
+}
+
+// ── Wave animation ─────────────────────────────────────────────
+let waveAnimId = null;
+function startWaveAnim() {
+  if (waveAnimId) return;
+  const canvas = document.getElementById('wave-canvas');
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+
+  function draw() {
+    if (!isPlaying) { waveAnimId = null; return; }
+    waveAnimId = requestAnimationFrame(draw);
+
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+    const W = canvas.width, H = canvas.height;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const meta = CAT_META[currentPreset?.cat || 'sleep'];
+    const beatHz = currentPreset?.beatHz || 10;
+
+    // Draw two sine waves (left / right channel visual)
+    for (let ch = 0; ch < 2; ch++) {
+      const freq = ch === 0 ? 1 : 1 + beatHz / 100;
+      const alpha = ch === 0 ? 0.7 : 0.4;
+      const offset = ch === 0 ? 0 : 8;
+
+      ctx.beginPath();
+      ctx.strokeStyle = meta.color;
+      ctx.globalAlpha = alpha;
+      ctx.lineWidth = ch === 0 ? 2 : 1.5;
+
+      for (let x = 0; x <= W; x++) {
+        const phase = (x / W) * Math.PI * 8 * freq + t;
+        const y = H / 2 + Math.sin(phase) * (H * 0.35) + offset;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+    t += 0.04;
+  }
+  draw();
+}
+
+// ── Background canvas ──────────────────────────────────────────
+function drawBg() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const meta = currentPreset ? CAT_META[currentPreset.cat] : { color: '#7c6aff' };
+  const c = meta.color;
+
+  // Radial gradient blobs
+  const g1 = ctx.createRadialGradient(canvas.width*0.2, canvas.height*0.2, 0, canvas.width*0.2, canvas.height*0.2, canvas.width*0.5);
+  g1.addColorStop(0, c + '18');
+  g1.addColorStop(1, 'transparent');
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const g2 = ctx.createRadialGradient(canvas.width*0.8, canvas.height*0.7, 0, canvas.width*0.8, canvas.height*0.7, canvas.width*0.4);
+  g2.addColorStop(0, c + '10');
+  g2.addColorStop(1, 'transparent');
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+// ── Render preset cards ────────────────────────────────────────
+function renderCards(filter) {
+  const grid = document.getElementById('preset-grid');
+  const heading = document.getElementById('grid-heading');
+  const list = filter === 'all' ? PRESETS : PRESETS.filter(p => p.cat === filter);
+
+  heading.textContent = filter === 'all' ? 'All Presets'
+    : CAT_META[filter]?.label + ' Presets';
+
+  grid.innerHTML = list.map(p => {
+    const meta = CAT_META[p.cat];
+    return `
+    <div class="preset-card" data-id="${p.id}" style="--card-c:${meta.color}">
+      <div class="card-wave-label" style="background:${meta.color}22;color:${meta.color}">${p.wave}</div>
+      <div class="card-icon">${p.icon}</div>
+      <div class="card-name">${p.name}</div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="card-freq">
+        <div class="freq-dot" style="background:${meta.color}"></div>
+        ${p.science}
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.preset-card').forEach(card => {
+    card.addEventListener('click', () => selectPreset(card.dataset.id));
+  });
+
+  markActiveCard();
+}
+
+function selectPreset(id) {
+  const preset = PRESETS.find(p => p.id === id);
+  if (!preset) return;
+  const wasPlaying = isPlaying;
+  stopPlayback();
+  currentPreset = preset;
+  drawBg();
+  updateHero();
+  markActiveCard();
+  if (wasPlaying) startPlayback();
+}
+
+// ── Event wiring ───────────────────────────────────────────────
+document.getElementById('play-btn').addEventListener('click', () => {
+  if (!currentPreset && PRESETS.length) selectPreset(PRESETS[0].id);
+  togglePlayback();
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.cat;
+    renderCards(currentFilter);
+  });
+});
+
+document.querySelectorAll('.timer-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    timerMinutes = parseInt(btn.dataset.min);
+    clearInterval(timerInterval);
+    timerRemaining = timerMinutes * 60;
+    if (isPlaying && timerMinutes > 0) startTimer(timerMinutes);
+    updateTimerDisplay();
+  });
+});
+
+document.getElementById('vol-slider').addEventListener('input', e => {
+  if (gainNode) gainNode.gain.value = e.target.value / 100;
+});
+
+// Set "Off" timer button as default selected
+document.querySelector('.timer-btn[data-min="0"]').classList.add('selected');
+
+window.addEventListener('resize', () => {
+  drawBg();
+});
+
+// ── Init ───────────────────────────────────────────────────────
+renderCards('all');
+drawBg();
+</script>
+</body>
+</html>
